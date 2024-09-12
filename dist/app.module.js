@@ -10,15 +10,28 @@ exports.AppModule = void 0;
 const common_1 = require("@nestjs/common");
 const app_controller_1 = require("./app.controller");
 const app_service_1 = require("./app.service");
+const typeorm_1 = require("@nestjs/typeorm");
 const detections_module_1 = require("./detections/detections.module");
-const detections_controller_controller_1 = require("./detections/detections-controller.controller");
+const detections_entity_1 = require("./detections/entities/detections.entity");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
 exports.AppModule = AppModule = __decorate([
     (0, common_1.Module)({
-        imports: [detections_module_1.DetectionsModule],
-        controllers: [app_controller_1.AppController, detections_controller_controller_1.DetectionsControllerController],
+        imports: [
+            detections_module_1.DetectionsModule,
+            typeorm_1.TypeOrmModule.forRoot({
+                type: 'mysql',
+                host: 'localhost',
+                port: 3306,
+                username: 'root',
+                password: '',
+                database: 'detection_teste',
+                entities: [detections_entity_1.DetectionEntity],
+                synchronize: true,
+            }),
+        ],
+        controllers: [app_controller_1.AppController],
         providers: [app_service_1.AppService],
     })
 ], AppModule);

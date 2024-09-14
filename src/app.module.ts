@@ -11,10 +11,10 @@ import { DetectionEntity } from './detections/entities/detections.entity';
     DetectionsModule,
     TypeOrmModule.forRoot({
       type: 'mysql',
-      host: 'localhost',
+      host: '34.19.59.178',
       port: 3306,
       username: 'root',
-      password: '',
+      password: 'demoday123',
       database: 'detection_teste',
       entities: [DetectionEntity],
       synchronize: true,    }),

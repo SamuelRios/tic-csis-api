@@ -22,10 +22,10 @@ exports.AppModule = AppModule = __decorate([
             detections_module_1.DetectionsModule,
             typeorm_1.TypeOrmModule.forRoot({
                 type: 'mysql',
-                host: 'localhost',
+                host: '34.19.59.178',
                 port: 3306,
                 username: 'root',
-                password: '',
+                password: 'demoday123',
                 database: 'detection_teste',
                 entities: [detections_entity_1.DetectionEntity],
                 synchronize: true,

@@ -1,10 +1,10 @@
-import { Detections } from '../interfaces/detections.interface';
+import { Detection } from '../interfaces/detection.interface';
 
-export class CreateDetectionsDto implements Detections {
+export class CreateDetectionDto implements Detection {
     cameraName: string
+    categoryNumber: string
     latitude: number
     longitude: number
-    categoryName: string
     timestamp: Date
     frame: string
 

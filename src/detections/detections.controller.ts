@@ -1,6 +1,6 @@
 import { Body, Controller, Get, Post } from '@nestjs/common';
-import { CreateDetectionsDto } from './dto/create-detections.dto';
-import { DetectionsService } from './detections.service';
+import { CreateDetectionDto } from './dto/create-detection.dto';
+import { DetectionsService } from './services/detections.service';
 import { DetectionEntity } from './entities/detection.entity';
 
 @Controller('detections')
@@ -14,8 +14,9 @@ export class DetectionsController {
 
   @Post()
   async create(
-    @Body() createDetectionsDto: CreateDetectionsDto,
+    @Body() createDetectionsDto: CreateDetectionDto,
   ): Promise<DetectionEntity> {
+    console.log(JSON.stringify(createDetectionsDto))
     return this.detectionsService.create(createDetectionsDto);
   }
 }

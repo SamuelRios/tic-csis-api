@@ -12,7 +12,12 @@ const app_controller_1 = require("./app.controller");
 const app_service_1 = require("./app.service");
 const typeorm_1 = require("@nestjs/typeorm");
 const detections_module_1 = require("./detections/detections.module");
-const detections_entity_1 = require("./detections/entities/detections.entity");
+const detection_entity_1 = require("./detections/entities/detection.entity");
+const camera_entity_1 = require("./detections/entities/camera.entity");
+const cameraLocation_entity_1 = require("./detections/entities/cameraLocation.entity");
+const operator_entity_1 = require("./detections/entities/operator.entity");
+const priority_entity_1 = require("./detections/entities/priority.entity");
+const status_entity_1 = require("./detections/entities/status.entity");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -27,7 +32,7 @@ exports.AppModule = AppModule = __decorate([
                 username: 'root',
                 password: 'demoday123',
                 database: 'detection_teste',
-                entities: [detections_entity_1.DetectionEntity],
+                entities: [detection_entity_1.DetectionEntity, camera_entity_1.CameraEntity, cameraLocation_entity_1.CameraLocationEntity, operator_entity_1.OperatorEntity, priority_entity_1.PriorityEntity, status_entity_1.StatusEntity],
                 synchronize: true,
             }),
         ],

@@ -1,27 +1,46 @@
-  import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  ManyToOne,
+  JoinColumn,
+} from 'typeorm';
+import { CameraEntity } from './camera.entity';
+import { CameraLocationEntity } from './cameraLocation.entity';
+import { OperatorEntity } from './operator.entity';
+import { StatusEntity } from './status.entity';
+import { PriorityEntity } from './priority.entity';
 
-@Entity()
+@Entity({ name: 'detections' })
 export class DetectionEntity {
   @PrimaryGeneratedColumn({ name: 'detection_id' })
   detectionId: number;
 
-  @Column({ name: 'camera_id' })
-  cameraId: number;
+  @ManyToOne(() => CameraEntity)
+  @JoinColumn({ name: 'camera_id' })
+  camera: CameraEntity;
 
-  @Column({ name: 'location_id' })
-  locationId: string;
-  
+  @ManyToOne(() => CameraLocationEntity)
+  @JoinColumn({ name: 'location_id' })
+  location: CameraLocationEntity;
+
   @Column()
   category: string;
 
   @Column({ name: 'frame_path' })
   framePath: string;
+  
+  @ManyToOne(() => OperatorEntity)
+  @JoinColumn({ name: 'operator_id' })
+  operator: OperatorEntity;
 
-  @Column({ name: 'status_id' })
-  statusId: number;
-
-  @Column({ name: 'priority_id' })
-  priorityId: number;
+  @ManyToOne(() => PriorityEntity)
+  @JoinColumn({ name: 'priority_id' })
+  priority: PriorityEntity;
+  
+  @ManyToOne(() => StatusEntity)
+  @JoinColumn({ name: 'status_id' })
+  status: StatusEntity;
 
   @Column()
   timestamp: Date;

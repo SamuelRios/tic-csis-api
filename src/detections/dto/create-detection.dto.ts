@@ -5,5 +5,5 @@ export class CreateDetectionDto {
     latitude: number
     longitude: number
     timestamp: Date
-    frame: string
+    framePath: string
 }

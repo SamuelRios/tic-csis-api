@@ -37,7 +37,7 @@ export class DetectionsService {
     detection.camera = camera;
     detection.location = cameraLocation;
     detection.category = cDetectionDto.categoryNumber;
-    detection.framePath = this.setFramePath(cDetectionDto.frame);
+    detection.framePath = cDetectionDto.framePath
     detection.priority = await this.getPriority(cDetectionDto.priorityName);
     // detection.statusId = this.getStatusId();
     detection.timestamp = new Date(cDetectionDto.timestamp);

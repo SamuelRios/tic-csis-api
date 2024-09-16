@@ -1,7 +1,17 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Post,
+  UploadedFile,
+  UseInterceptors,
+} from '@nestjs/common';
 import { CreateDetectionDto } from './dto/create-detection.dto';
 import { DetectionsService } from './services/detections.service';
 import { DetectionEntity } from './entities/detection.entity';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { diskStorage } from 'multer';
+import { extname } from 'path';
 
 @Controller('detections')
 export class DetectionsController {
@@ -13,10 +23,25 @@ export class DetectionsController {
   }
 
   @Post()
+  @UseInterceptors(
+    FileInterceptor('frame', {
+      storage: diskStorage({
+        destination: './resources/frames',
+        filename: (req, file, callback) => {
+          const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
+          const ext = extname(file.originalname);
+          const filename = `${uniqueSuffix}${ext}`;
+          callback(null, filename);
+        },
+      }),
+    })
+  )
   async create(
-    @Body() createDetectionsDto: CreateDetectionDto,
+    @UploadedFile() detectionFrame: Express.Multer.File,
+    @Body('data') detectionDataDto: string,
   ): Promise<DetectionEntity> {
-    console.log(JSON.stringify(createDetectionsDto))
-    return this.detectionsService.create(createDetectionsDto);
+    const detectionData: CreateDetectionDto = JSON.parse(detectionDataDto);
+    detectionData.framePath = detectionFrame.path;
+    return this.detectionsService.create(detectionData);
   }
 }

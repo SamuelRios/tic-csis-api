@@ -9,6 +9,10 @@ import { CameraLocationService } from './cameraLocation.service';
 import { CameraLocationEntity } from '../entities/cameraLocation.entity';
 import { PriorityEntity } from '../entities/priority.entity';
 import { PriorityService } from './priority.service';
+import { StatusService } from './status.service';
+import { OperatorService } from './operator.service';
+import { StatusEntity } from '../entities/status.entity';
+import { OperatorEntity } from '../entities/operator.entity';
 
 @Injectable()
 export class DetectionsService {
@@ -18,6 +22,8 @@ export class DetectionsService {
     private readonly cameraService: CameraService,
     private readonly cameraLocationService: CameraLocationService,
     private readonly priorityService: PriorityService,
+    private readonly statusService: StatusService,
+    private readonly operatorService: OperatorService,
   ) {}
 
   async findAll(): Promise<DetectionEntity[]> {
@@ -31,6 +37,7 @@ export class DetectionsService {
     const { camera, cameraLocation } = await this.getDetectionCameraAndLocation(
       cDetectionDto.cameraName,cDetectionDto.timestamp, cDetectionDto.latitude, cDetectionDto.longitude
     );
+    console.log("depois do get")
     console.log(JSON.stringify(camera))
     console.log(JSON.stringify(cameraLocation))
     const detection = this.detectionsRepository.create();
@@ -39,7 +46,9 @@ export class DetectionsService {
     detection.category = cDetectionDto.categoryNumber;
     detection.framePath = cDetectionDto.framePath
     detection.priority = await this.getPriority(cDetectionDto.priorityName);
-    // detection.statusId = this.getStatusId();
+    console.log("aqui antes do status")
+    detection.status = await this.getDetectionStatus("Aberto");
+    detection.operator = await this.getDetectionOperator("Operador 01");
     detection.timestamp = new Date(cDetectionDto.timestamp);
     return this.detectionsRepository.save(detection);
   }
@@ -59,6 +68,20 @@ export class DetectionsService {
     return `c:/detection_frames/frameName`;
   }
 
+  async getDetectionStatus(statusName: string): Promise<StatusEntity> {
+    let status: StatusEntity = await this.statusService.findByName(statusName);
+    if(!status)
+      status = await this.statusService.create({statusName: statusName});
+    return status;
+  }
+
+  async getDetectionOperator(operatorName: string){
+    let operator: OperatorEntity = await this.operatorService.findByName(operatorName);
+    if(!operator)
+      operator = await this.operatorService.create({operatorName: operatorName});
+    return operator;
+  }
+
 
   async getDetectionCameraAndLocation(cameraName: string, timestamp: Date, latitude?: number, longitude?: number) {
     let camera: CameraEntity = await this.cameraService.findByName(cameraName);
@@ -68,8 +91,6 @@ export class DetectionsService {
       if (!camera) {
         throw new BadRequestException('Camera location incomplete. Please, provide latitude and longitude.');
       }
-      
-      cameraLocation = await this.cameraLocationService.findActiveByCameraId(camera.cameraId);
     } else {
       console.log("aqui")
       if (!camera) {
@@ -81,12 +102,9 @@ export class DetectionsService {
       
       if (cameraLocation) {
         console.log("cá")
-        console.log(cameraLocation.latitude)
-        console.log(latitude)
-        console.log(cameraLocation.longitude)
-        console.log(longitude)
+        console.log(JSON.stringify(cameraLocation))
         if (cameraLocation.latitude != latitude || cameraLocation.longitude != longitude) {
-          
+          console.log("teste aqui")
           await this.cameraLocationService.update(cameraLocation.locationId, { isActive: false });
           console.log(timestamp)
           cameraLocation = await this.cameraLocationService.create({

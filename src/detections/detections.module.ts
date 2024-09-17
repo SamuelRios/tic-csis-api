@@ -11,10 +11,12 @@ import { OperatorEntity } from './entities/operator.entity';
 import { PriorityEntity } from './entities/priority.entity';
 import { StatusEntity } from './entities/status.entity';
 import { PriorityService } from './services/priority.service';
+import { StatusService } from './services/status.service';
+import { OperatorService } from './services/operator.service';
 
 @Module({
   imports: [TypeOrmModule.forFeature([DetectionEntity, CameraEntity, CameraLocationEntity, OperatorEntity, PriorityEntity, StatusEntity])], // Aqui você registra a entidade
   controllers: [DetectionsController],
-  providers: [DetectionsService, CameraService, CameraLocationService, PriorityService],
+  providers: [DetectionsService, CameraService, CameraLocationService, PriorityService, StatusService, OperatorService],
 })
 export class DetectionsModule {}

@@ -26,7 +26,7 @@ export class DetectionsController {
   @UseInterceptors(
     FileInterceptor('frame', {
       storage: diskStorage({
-        destination: './resources/frames',
+        destination: 'C:\\xampp\\htdocs\\dashboardcsis\\imagens\\frames',
         filename: (req, file, callback) => {
           const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
           const ext = extname(file.originalname);
@@ -41,7 +41,7 @@ export class DetectionsController {
     @Body('data') detectionDataDto: string,
   ): Promise<DetectionEntity> {
     const detectionData: CreateDetectionDto = JSON.parse(detectionDataDto);
-    detectionData.framePath = detectionFrame.path;
+    detectionData.framePath = "imagens/frames/" + detectionFrame.filename;
     return this.detectionsService.create(detectionData);
   }
 }

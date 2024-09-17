@@ -19,10 +19,11 @@ export class CameraLocationService {
 
   async create(cameraLocationData: Partial<CameraLocationEntity>): Promise<CameraLocationEntity> {
     const newCameraLocation = this.cameraLocationRepository.create(cameraLocationData);
+    newCameraLocation.locationId = cameraLocationData.camera.name;
     return this.cameraLocationRepository.save(newCameraLocation);
   }
 
-  async update(cameraLocationId: number, updateData: Partial<CameraLocationEntity>): Promise<void> {
+  async update(cameraLocationId: string, updateData: Partial<CameraLocationEntity>): Promise<void> {
     await this.cameraLocationRepository.update(cameraLocationId, updateData);
   }
 }

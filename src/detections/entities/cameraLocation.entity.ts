@@ -1,11 +1,11 @@
-import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, JoinColumn } from 'typeorm';
+import { Entity, Column, ManyToOne, JoinColumn, PrimaryColumn } from 'typeorm';
 import { CameraEntity } from './camera.entity';
 
 @Entity({ name: 'camera_locations' })
 export class CameraLocationEntity {
 
-  @PrimaryGeneratedColumn({ name: 'location_id' })
-  locationId: number;
+  @PrimaryColumn({ name: 'location_id' })
+  locationId: string;
 
   @ManyToOne(() => CameraEntity)
   @JoinColumn({ name: 'camera_id' })

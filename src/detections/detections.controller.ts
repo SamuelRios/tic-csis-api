@@ -41,7 +41,7 @@ export class DetectionsController {
     @Body('data') detectionDataDto: string,
   ): Promise<DetectionEntity> {
     const detectionData: CreateDetectionDto = JSON.parse(detectionDataDto);
-    detectionData.framePath = "imagens/frames/" + detectionFrame.filename;
-    return this.detectionsService.create(detectionData);
+    const framePath = "imagens/frames/" + detectionFrame.filename;
+    return this.detectionsService.create(detectionData, framePath);
   }
 }

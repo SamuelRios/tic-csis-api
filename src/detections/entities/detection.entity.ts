@@ -27,6 +27,12 @@ export class DetectionEntity {
   @Column()
   category: string;
 
+  @Column({name: "class_number"})
+  classNumber: number;
+
+  @Column({name: "class_name"})
+  className: string;
+  
   @Column({ name: 'frame_path' })
   framePath: string;
   

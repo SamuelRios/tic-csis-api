@@ -32,6 +32,7 @@ export class DetectionsService {
 
   async create(
     cDetectionDto: CreateDetectionDto,
+    framePath: string
   ): Promise<DetectionEntity> {
     console.log(cDetectionDto.timestamp);
     const { camera, cameraLocation } = await this.getDetectionCameraAndLocation(
@@ -44,7 +45,9 @@ export class DetectionsService {
     detection.camera = camera;
     detection.location = cameraLocation;
     detection.category = cDetectionDto.categoryNumber;
-    detection.framePath = cDetectionDto.framePath
+    detection.classNumber = cDetectionDto.classNumber;
+    detection.className = cDetectionDto.className;
+    detection.framePath = framePath
     detection.priority = await this.getPriority(cDetectionDto.priorityName);
     console.log("aqui antes do status")
     detection.status = await this.getDetectionStatus("Aberto");
@@ -58,14 +61,6 @@ export class DetectionsService {
     if(!priority)
       priority = await this.priorityService.create({ priorityName: priorityName });
     return priority;
-  }
-
-  getLocationId(latitude: number, longitude: number): string {
-    return `ufbaLocation`;
-  }
-
-  setFramePath(frame: string): string {
-    return `c:/detection_frames/frameName`;
   }
 
   async getDetectionStatus(statusName: string): Promise<StatusEntity> {
@@ -85,38 +80,24 @@ export class DetectionsService {
 
   async getDetectionCameraAndLocation(cameraName: string, timestamp: Date, latitude?: number, longitude?: number) {
     let camera: CameraEntity = await this.cameraService.findByName(cameraName);
+    
+
+    if (!camera) {
+      camera = await this.cameraService.create({ name: cameraName, hasGps: true });
+    }
+    console.log("aqui")
+    
     let cameraLocation: CameraLocationEntity;
-
-    if (!longitude || !latitude) {
-      if (!camera) {
-        throw new BadRequestException('Camera location incomplete. Please, provide latitude and longitude.');
-      }
-    } else {
-      console.log("aqui")
-      if (!camera) {
-        camera = await this.cameraService.create({ name: cameraName, hasGps: true });
-      }
-
-      console.log(JSON.stringify(camera))
-      cameraLocation = await this.cameraLocationService.findActiveByCameraId(camera.cameraId);
-      
-      if (cameraLocation) {
-        console.log("cá")
-        console.log(JSON.stringify(cameraLocation))
-        if (cameraLocation.latitude != latitude || cameraLocation.longitude != longitude) {
-          console.log("teste aqui")
-          await this.cameraLocationService.update(cameraLocation.locationId, { isActive: false });
-          console.log(timestamp)
-          cameraLocation = await this.cameraLocationService.create({
-            camera: camera,
-            latitude: latitude,
-            longitude: longitude,
-            isActive: true,
-            timestamp: timestamp
-          });
-        }
-      } else {
-        console.log("coá")
+    console.log(JSON.stringify(camera))
+    cameraLocation = await this.cameraLocationService.findActiveByCameraId(camera.cameraId);
+    
+    if (cameraLocation) {
+      console.log("cá")
+      console.log(JSON.stringify(cameraLocation))
+      if (cameraLocation.latitude != latitude || cameraLocation.longitude != longitude) {
+        console.log("teste aqui")
+        await this.cameraLocationService.update(cameraLocation.locationId, { isActive: false });
+        console.log(timestamp)
         cameraLocation = await this.cameraLocationService.create({
           camera: camera,
           latitude: latitude,
@@ -124,8 +105,18 @@ export class DetectionsService {
           isActive: true,
           timestamp: timestamp
         });
-        
       }
+    } else {
+      console.log("coá")
+      if(latitude && longitude)
+        cameraLocation = await this.cameraLocationService.create({
+          camera: camera,
+          latitude: latitude,
+          longitude: longitude,
+          isActive: true,
+          timestamp: timestamp
+        });
+      
     }
 
     return { camera, cameraLocation };

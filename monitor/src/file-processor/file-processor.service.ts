@@ -13,11 +13,15 @@ export class FileProcessorService {
     constructor(private readonly httpService: HttpService) {}
 
     async processFile(filePath: string, fileName: string) {
-        console.log("processando o arquivo \"" + filePath + "\"");
-        console.log(fileName, fileName);
         let detection = this.getJsonFromFile(filePath);
-        const responseData = await this.sendDetection(detection, fileName);
-        console.log(responseData);
+        try {
+
+            const responseData = await this.sendDetection(detection, fileName);
+        }catch {
+            console.log("deu ruim na req")
+        }
+        // console.log("depois da requisição")
+        // console.log(responseData);
     }
 
     getJsonFromFile(filePath: string){
@@ -25,10 +29,11 @@ export class FileProcessorService {
         try {
           const data = fs.readFileSync(filePath, 'utf8');
           const jsonData = JSON.parse(data);
-          console.log(jsonData);
+        //   console.log(jsonData);
           return jsonData;
         } catch (err) {
-          console.error('Error reading or parsing the file; ', err);
+            console.log("caiu aq no erro 32")
+        //   console.error('Error reading or parsing the file; ', err);
         }
     }
 
@@ -49,7 +54,8 @@ export class FileProcessorService {
             );
             return response.data;
         } catch (error) {
-            console.error('Error fetching data from API', error);
+            console.log("caiu aq no erro 53")
+            // console.error('Error fetching data from API', error);
             throw error;
         }
     }

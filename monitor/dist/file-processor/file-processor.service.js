@@ -22,22 +22,23 @@ let FileProcessorService = class FileProcessorService {
         this.prefixImagePath = 'C:/Users/Formas/Desktop/tic-csis-api/monitor/detection-images/';
     }
     async processFile(filePath, fileName) {
-        console.log("processando o arquivo \"" + filePath + "\"");
-        console.log(fileName, fileName);
         let detection = this.getJsonFromFile(filePath);
-        const responseData = await this.sendDetection(detection, fileName);
-        console.log(responseData);
+        try {
+            const responseData = await this.sendDetection(detection, fileName);
+        }
+        catch {
+            console.log("deu ruim na req");
+        }
     }
     getJsonFromFile(filePath) {
         const fs = require('fs');
         try {
             const data = fs.readFileSync(filePath, 'utf8');
             const jsonData = JSON.parse(data);
-            console.log(jsonData);
             return jsonData;
         }
         catch (err) {
-            console.error('Error reading or parsing the file; ', err);
+            console.log("caiu aq no erro 32");
         }
     }
     async sendDetection(detection, fileName) {
@@ -53,7 +54,7 @@ let FileProcessorService = class FileProcessorService {
             return response.data;
         }
         catch (error) {
-            console.error('Error fetching data from API', error);
+            console.log("caiu aq no erro 53");
             throw error;
         }
     }

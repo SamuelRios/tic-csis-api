@@ -6,7 +6,7 @@ import { DetectionsModule } from './detections/detections.module';
 import { DetectionEntity } from './detections/entities/detection.entity';
 import { CameraEntity } from './detections/entities/camera.entity';
 import { CameraLocationEntity } from './detections/entities/cameraLocation.entity';
-import { OperatorEntity } from './detections/entities/operator.entity';
+import { UserEntity } from './detections/entities/user.entity';
 import { PriorityEntity } from './detections/entities/priority.entity';
 import { StatusEntity } from './detections/entities/status.entity';
 
@@ -15,13 +15,13 @@ import { StatusEntity } from './detections/entities/status.entity';
     DetectionsModule,
     TypeOrmModule.forRoot({
       type: 'mysql',
-      host: '34.19.59.178',
+      host: 'localhost',
       port: 3306,
       username: 'root',
-      password: 'demoday123',
-      database: 'detection_system',
-      entities: [DetectionEntity, CameraEntity, CameraLocationEntity, OperatorEntity, PriorityEntity, StatusEntity],
-      synchronize: true,
+      password: '',
+      database: 'detection_test',
+      entities: [DetectionEntity, CameraEntity, CameraLocationEntity, UserEntity, PriorityEntity, StatusEntity],
+      synchronize: false,
     }),
   ],
   controllers: [AppController],

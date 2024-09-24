@@ -7,7 +7,7 @@ import {
 } from 'typeorm';
 import { CameraEntity } from './camera.entity';
 import { CameraLocationEntity } from './cameraLocation.entity';
-import { OperatorEntity } from './operator.entity';
+import { UserEntity } from './user.entity';
 import { StatusEntity } from './status.entity';
 import { PriorityEntity } from './priority.entity';
 
@@ -26,27 +26,23 @@ export class DetectionEntity {
 
   @Column()
   category: string;
-
-  @Column({name: "class_number"})
-  classNumber: number;
-
-  @Column({name: "class_name"})
-  className: string;
   
   @Column({ name: 'frame_path' })
   framePath: string;
   
-  @ManyToOne(() => OperatorEntity)
-  @JoinColumn({ name: 'operator_id' })
-  operator: OperatorEntity;
+  @ManyToOne(() => StatusEntity)
+  @JoinColumn({ name: 'status_id' })
+  status: StatusEntity;
+
+  
 
   @ManyToOne(() => PriorityEntity)
   @JoinColumn({ name: 'priority_id' })
   priority: PriorityEntity;
   
-  @ManyToOne(() => StatusEntity)
-  @JoinColumn({ name: 'status_id' })
-  status: StatusEntity;
+  @ManyToOne(() => UserEntity)
+  @JoinColumn({ name: 'user_id' })
+  user: UserEntity;
 
   @Column()
   timestamp: Date;

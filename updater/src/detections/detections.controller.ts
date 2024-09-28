@@ -56,6 +56,7 @@ export class DetectionsController {
     if(!detection)
       return this.detectionsService.create(detectionData, framePath);
     else {
+      console.log(detection)
       const filePath = `C:\\xampp\\htdocs\\dashboardcsis\\imagens\\frames\\${detectionFrame.filename}`;
       try {
         await fs.unlink(filePath); // Apaga o arquivo
@@ -73,15 +74,15 @@ export class DetectionsController {
       if(closedDetection){
         console.log(closedDetection)
         console.log("limpando cache:")
-        console.log(await this.notifyDetectionClosed(closedDetection.camera.name, closedDetection.category));
+        console.log(await this.notifyClosedDetection(closedDetection.camera.name, closedDetection.category));
       }
-      return "Fechado."
+      return "Fechado.";
   }
 
-  async notifyDetectionClosed(cameraName: string, category: string){
+  async notifyClosedDetection(cameraName: string, category: string){
     try {
      const response = await firstValueFrom(
-          this.httpService.post(`${this.urlMonitorAPI}clear/${cameraName}/${category}`),
+          this.httpService.post(`${this.urlMonitorAPI}detection/clear/${cameraName}/${category}`),
       );
       if(response?.status == 201)
        return response.data;

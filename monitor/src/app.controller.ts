@@ -1,5 +1,6 @@
 import { Controller, Param, Post } from '@nestjs/common';
 import { CacheService } from './services/cache/cache.service';
+import { CategoryEnum } from './enum/category.enum';
 
 @Controller("/detection")
 export class AppController {
@@ -9,15 +10,18 @@ export class AppController {
   @Post('clear/:cameraName/:category')
   clearDetectionCache(
     @Param('cameraName') cameraName: string,
-    @Param('category') category: number
+    @Param('category') category: string
   ) {
+    
     const detection: Detection = {
       cameraName,
-      categoryNumber: category,
+      categoryNumber: CategoryEnum.getCategoryNumber(category),
       timestamp: undefined
     }
-    
-    this.cacheService.clearDetectionCache(detection);
+    console.log(this.cacheService)
+    this.cacheService.clearDetectionCache(detection)
+    ;
+    console.log(this.cacheService)
     console.log(`Cache limpo para a câmera: ${cameraName} e categoria: ${category}`)
     return `Cache limpo para a câmera: ${cameraName} e categoria: ${category}`;
   }

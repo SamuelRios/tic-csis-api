@@ -6,4 +6,8 @@ export class CategoryEnum {
         }
         return 'Unknown';
     }
+
+    static getCategoryNumber(category): number{
+        return this.enum.findIndex(element => element == category);
+    }
 }

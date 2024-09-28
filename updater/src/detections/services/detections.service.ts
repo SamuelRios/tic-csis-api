@@ -37,8 +37,11 @@ export class DetectionsService {
           name: cameraName
         },
         category,
-        status: Not('closed'),
-      }
+        status: {
+          statusId: Not(2)
+        },
+      },
+      relations: ["status"]
     });
   }
 
@@ -67,8 +70,7 @@ export class DetectionsService {
   }
 
   async closeDetection(detectionId: number): Promise<DetectionEntity | null> {
-    // Busque a detecção pelo ID
-    const detection = await this.detectionsRepository.findOne({ where: { detectionId } });
+    const detection = await this.detectionsRepository.findOne({ where: { detectionId, status: {statusId: Not(2)} }, relations: ['camera'] });
     
     if (!detection) {
       return null;

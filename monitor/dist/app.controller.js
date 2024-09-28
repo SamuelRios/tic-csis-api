@@ -15,6 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.AppController = void 0;
 const common_1 = require("@nestjs/common");
 const cache_service_1 = require("./services/cache/cache.service");
+const category_enum_1 = require("./enum/category.enum");
 let AppController = class AppController {
     constructor(cacheService) {
         this.cacheService = cacheService;
@@ -22,10 +23,12 @@ let AppController = class AppController {
     clearDetectionCache(cameraName, category) {
         const detection = {
             cameraName,
-            categoryNumber: category,
+            categoryNumber: category_enum_1.CategoryEnum.getCategoryNumber(category),
             timestamp: undefined
         };
+        console.log(this.cacheService);
         this.cacheService.clearDetectionCache(detection);
+        console.log(this.cacheService);
         console.log(`Cache limpo para a câmera: ${cameraName} e categoria: ${category}`);
         return `Cache limpo para a câmera: ${cameraName} e categoria: ${category}`;
     }
@@ -36,7 +39,7 @@ __decorate([
     __param(0, (0, common_1.Param)('cameraName')),
     __param(1, (0, common_1.Param)('category')),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, Number]),
+    __metadata("design:paramtypes", [String, String]),
     __metadata("design:returntype", void 0)
 ], AppController.prototype, "clearDetectionCache", null);
 exports.AppController = AppController = __decorate([

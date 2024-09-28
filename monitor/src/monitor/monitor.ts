@@ -28,20 +28,20 @@ export class Monitor {
                     if(files.findIndex(fileName => fileName == this.fileName) > -1){ 
                         const filePath = path.join(this.directoryPath, this.fileName);
                         const jsonFile = this.getJsonFromFile(filePath);
-                        // this.simulateModel(jsonFile)
-                        await this.fileProcessorService.process({
-                            "timestamp": "2024-09-24 11:29:27",
-                            "detections": [
-                                {
-                                    "class": 3,
-                                    "confidence": 0.9404955506324768
-                                },
-                                {
-                                    "class": 3,
-                                    "confidence": 0.4982752799987793
-                                }
-                            ]
-                        },)
+                        this.simulateModel(jsonFile)
+                        // await this.fileProcessorService.process({
+                        //     "timestamp": "2024-09-24 11:29:27",
+                        //     "detections": [
+                        //         {
+                        //             "class": 3,
+                        //             "confidence": 0.9404955506324768
+                        //         },
+                        //         {
+                        //             "class": 3,
+                        //             "confidence": 0.4982752799987793
+                        //         }
+                        //     ]
+                        // },)
                         console.log("finalizei")
                     } else console.log("\"" + this.fileName + "\" file not found");
                 }

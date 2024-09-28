@@ -27,9 +27,9 @@ export class DetectionsController {
     private readonly httpService: HttpService
   ) {}
 
-  @Get()
-  async getAll(): Promise<DetectionEntity[]> {
-    return await this.detectionsService.findAll();
+  @Get('active')
+  async getActiveDetections(): Promise<DetectionEntity[]> {
+    return this.detectionsService.getAllActiveDetections();
   }
 
   @Post() 

@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, forwardRef, Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Not, Repository } from 'typeorm';
 import { CreateDetectionDto } from '../dto/create-detection.dto';
@@ -26,11 +26,24 @@ export class DetectionsService {
     private readonly priorityService: PriorityService,
     private readonly statusService: StatusService,
     private readonly userService: UserService,
+    @Inject(forwardRef(() => DetectionGateway))
     private readonly detectionGateway: DetectionGateway
   ) {}
 
   async findAll(): Promise<DetectionEntity[]> {
     return await this.detectionsRepository.find();
+  }
+  
+  // Método para retornar todas as detecções ativas
+  async getAllActiveDetections(): Promise<DetectionEntity[]> {
+    return this.detectionsRepository.find({
+      where: {
+        status: {
+          statusId: Not(2)
+        }
+      },
+      relations: ['camera', 'location', 'user', 'priority', 'status']
+    });
   }
 
   async getActiveDetectionByCameraNameAndCategory(cameraName: string, category: string): Promise<DetectionEntity | null> {

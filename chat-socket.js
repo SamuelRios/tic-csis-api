@@ -9,6 +9,13 @@ socket.on('detectionUpdate', (detection) => {
   handleNewMessage(detection);
 })
 
+socket.on('activeDetections', (detections) => {
+  console.log(detections)
+  detections.forEach(detection => {
+    handleNewMessage(detection);
+  });
+})
+
 const handleNewMessage = (detection) => {
   messages.appendChild(buildNewMessage(detection));
 }

@@ -53,17 +53,17 @@ export class Monitor {
     private indexJobSimulator: number = 0;
 
     simulateModel(jsonFile){
-        console.log('Iniciando execução...');
-        setTimeout(() => {
+        setTimeout(async () => {
             if(this.indexJobSimulator < jsonFile.length){
+                console.log('Iniciando da execução...');
                 console.log(jsonFile[this.indexJobSimulator])
-                this.fileProcessorService.process(jsonFile[this.indexJobSimulator])
-                console.log('Finalizando execução...');
+                await this.fileProcessorService.process(jsonFile[this.indexJobSimulator])
+                console.log('Fim da execução...');
                 this.indexJobSimulator++;
             }
             this.simulateModel(jsonFile);
            
-        }, 20);
+        }, 1000);
     }
 
     getJsonFromFile(filePath: string){

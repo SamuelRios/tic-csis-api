@@ -32,9 +32,10 @@ export class ProcessorService {
             }
             if(!this.cacheService.isDetectionInCache(myDetection)){
                 try {
+                    this.cacheService.setDectionInCache(myDetection);
                     console.log("vou salvar")
                     const response = await this.sendDetection(myDetection);
-                    if(response) this.cacheService.setDectionInCache(myDetection);
+                    if(!response) this.cacheService.clearDetectionCache(myDetection);
                 } catch {
                     console.log("agora eh na req")
                 }

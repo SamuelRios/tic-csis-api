@@ -63,7 +63,7 @@ export class Monitor {
             }
             this.simulateModel(jsonFile);
            
-        }, 1000);
+        }, 20);
     }
 
     getJsonFromFile(filePath: string){

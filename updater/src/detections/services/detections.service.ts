@@ -13,9 +13,11 @@ import { StatusService } from './status.service';
 import { UserService } from './user.service';
 import { StatusEntity } from '../entities/status.entity';
 import { UserEntity } from '../entities/user.entity';
+import { DetectionGateway } from '../gateways/detection/detection.gateway';
 
 @Injectable()
 export class DetectionsService {
+  
   constructor(
     @InjectRepository(DetectionEntity)
     private detectionsRepository: Repository<DetectionEntity>,
@@ -24,6 +26,7 @@ export class DetectionsService {
     private readonly priorityService: PriorityService,
     private readonly statusService: StatusService,
     private readonly userService: UserService,
+    private readonly detectionGateway: DetectionGateway
   ) {}
 
   async findAll(): Promise<DetectionEntity[]> {
@@ -66,7 +69,9 @@ export class DetectionsService {
     detection.status = await this.getStatus("Aberto");
     detection.user = await this.getUser("Operador 01");
     detection.timestamp = new Date(cDetectionDto.timestamp);
-    return this.detectionsRepository.save(detection);
+    const savedDetection = await this.detectionsRepository.save(detection);
+    this.detectionGateway.sendDetectionUpdate(savedDetection);
+    return savedDetection;
   }
 
   async closeDetection(detectionId: number): Promise<DetectionEntity | null> {

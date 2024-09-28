@@ -14,6 +14,7 @@ import { PriorityService } from './services/priority.service';
 import { StatusService } from './services/status.service';
 import { UserService } from './services/user.service';
 import { HttpModule } from '@nestjs/axios';
+import { DetectionGateway } from './gateways/detection/detection.gateway';
 
 @Module({
   imports: [
@@ -30,6 +31,14 @@ import { HttpModule } from '@nestjs/axios';
     HttpModule,
   ],
   controllers: [DetectionsController],
-  providers: [DetectionsService, CameraService, CameraLocationService, PriorityService, StatusService, UserService],
+  providers: [
+    DetectionsService,
+    CameraService,
+    CameraLocationService,
+    PriorityService,
+    StatusService,
+    UserService,
+    DetectionGateway
+  ],
 })
 export class DetectionsModule {}

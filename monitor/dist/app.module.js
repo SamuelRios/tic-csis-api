@@ -9,11 +9,11 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.AppModule = void 0;
 const common_1 = require("@nestjs/common");
 const app_controller_1 = require("./app.controller");
-const app_service_1 = require("./app.service");
 const schedule_1 = require("@nestjs/schedule");
-const folder_monitor_service_1 = require("./folder-monitor/folder-monitor.service");
-const file_processor_service_1 = require("./file-processor/file-processor.service");
+const monitor_1 = require("./monitor/monitor");
+const processor_service_1 = require("./services/processor/processor.service");
 const axios_1 = require("@nestjs/axios");
+const cache_service_1 = require("./services/cache/cache.service");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -21,7 +21,7 @@ exports.AppModule = AppModule = __decorate([
     (0, common_1.Module)({
         imports: [schedule_1.ScheduleModule.forRoot(), axios_1.HttpModule],
         controllers: [app_controller_1.AppController],
-        providers: [app_service_1.AppService, folder_monitor_service_1.FolderMonitorService, file_processor_service_1.FileProcessorService],
+        providers: [monitor_1.Monitor, processor_service_1.ProcessorService, cache_service_1.CacheService],
     })
 ], AppModule);
 //# sourceMappingURL=app.module.js.map

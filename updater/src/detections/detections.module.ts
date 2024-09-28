@@ -13,9 +13,22 @@ import { StatusEntity } from './entities/status.entity';
 import { PriorityService } from './services/priority.service';
 import { StatusService } from './services/status.service';
 import { UserService } from './services/user.service';
+import { HttpModule } from '@nestjs/axios';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([DetectionEntity, CameraEntity, CameraLocationEntity, UserEntity, PriorityEntity, StatusEntity])], // Aqui você registra a entidade
+  imports: [
+    TypeOrmModule.forFeature(
+      [
+        DetectionEntity,
+        CameraEntity,
+        CameraLocationEntity,
+        UserEntity,
+        PriorityEntity,
+        StatusEntity
+      ]
+    ),
+    HttpModule,
+  ],
   controllers: [DetectionsController],
   providers: [DetectionsService, CameraService, CameraLocationService, PriorityService, StatusService, UserService],
 })

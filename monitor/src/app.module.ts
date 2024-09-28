@@ -1,14 +1,14 @@
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
-import { AppService } from './app.service';
 import { ScheduleModule } from '@nestjs/schedule';
-import { FolderMonitorService } from './folder-monitor/folder-monitor.service';
-import { FileProcessorService } from './file-processor/file-processor.service';
+import { Monitor } from './monitor/monitor';
+import { ProcessorService } from './services/processor/processor.service';
 import { HttpModule } from '@nestjs/axios';
+import { CacheService } from './services/cache/cache.service';
 
 @Module({
   imports: [ScheduleModule.forRoot(), HttpModule],
   controllers: [AppController],
-  providers: [AppService, FolderMonitorService, FileProcessorService],
+  providers: [Monitor, ProcessorService, CacheService],
 })
 export class AppModule {}

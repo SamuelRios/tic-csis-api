@@ -1,5 +1,5 @@
 export class CreateDetectionDto {
     cameraName: string
-    categoryNumber: string
+    category: string
     timestamp: Date
 }

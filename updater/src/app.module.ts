@@ -1,6 +1,4 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { DetectionsModule } from './detections/detections.module';
 import { DetectionEntity } from './detections/entities/detection.entity';
@@ -18,13 +16,13 @@ import { StatusEntity } from './detections/entities/status.entity';
       host: 'localhost',
       port: 3306,
       username: 'root',
-      password: '',
+      password: 'dbadmin01',
       database: 'detection_test',
       entities: [DetectionEntity, CameraEntity, CameraLocationEntity, UserEntity, PriorityEntity, StatusEntity],
-      synchronize: false,
+      synchronize: true,
     }),
   ],
-  controllers: [AppController],
-  providers: [AppService],
+  controllers: [],
+  providers: [],
 })
 export class AppModule {}

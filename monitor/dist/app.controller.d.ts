@@ -1,6 +1,6 @@
-import { AppService } from './app.service';
+import { CacheService } from './services/cache/cache.service';
 export declare class AppController {
-    private readonly appService;
-    constructor(appService: AppService);
-    getHello(): string;
+    private readonly cacheService;
+    constructor(cacheService: CacheService);
+    clearDetectionCache(cameraName: string, category: number): string;
 }

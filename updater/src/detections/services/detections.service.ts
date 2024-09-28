@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Not, Repository } from 'typeorm';
 import { CreateDetectionDto } from '../dto/create-detection.dto';
 import { DetectionEntity } from '../entities/detection.entity';
 import { CameraEntity } from '../entities/camera.entity';
@@ -30,6 +30,18 @@ export class DetectionsService {
     return await this.detectionsRepository.find();
   }
 
+  async getActiveDetectionByCameraNameAndCategory(cameraName: string, category: string): Promise<DetectionEntity | null> {
+    return await this.detectionsRepository.findOne({
+      where: {
+        camera: {
+          name: cameraName
+        },
+        category,
+        status: Not('closed'),
+      }
+    });
+  }
+
   async create(
     cDetectionDto: CreateDetectionDto,
     framePath: string
@@ -44,31 +56,36 @@ export class DetectionsService {
     const detection = this.detectionsRepository.create();
     detection.camera = camera;
     detection.location = cameraLocation;
-    detection.category = cDetectionDto.categoryNumber;
+    detection.category = cDetectionDto.category;
     detection.framePath = framePath
     // detection.priority = await this.getPriority(cDetectionDto.priorityName);
     console.log("aqui antes do status")
-    detection.status = await this.getDetectionStatus("Aberto");
-    detection.user = await this.getDetectionUser("Operador 01");
+    detection.status = await this.getStatus("Aberto");
+    detection.user = await this.getUser("Operador 01");
     detection.timestamp = new Date(cDetectionDto.timestamp);
     return this.detectionsRepository.save(detection);
   }
 
-  async getPriority(priorityName: string): Promise<PriorityEntity> {
-    let priority: PriorityEntity = await this.priorityService.findByName(priorityName);
-    if(!priority)
-      priority = await this.priorityService.create({ priorityName: priorityName });
-    return priority;
+  async closeDetection(detectionId: number): Promise<DetectionEntity | null> {
+    // Busque a detecção pelo ID
+    const detection = await this.detectionsRepository.findOne({ where: { detectionId } });
+    
+    if (!detection) {
+      return null;
+    }
+
+    detection.status = await this.getStatus("Fechado");
+    return this.detectionsRepository.save(detection);
   }
 
-  async getDetectionStatus(statusName: string): Promise<StatusEntity> {
+  private async getStatus(statusName: string): Promise<StatusEntity> {
     let status: StatusEntity = await this.statusService.findByName(statusName);
     if(!status)
       status = await this.statusService.create({statusName: statusName});
     return status;
   }
 
-  async getDetectionUser(userName: string){
+  private async getUser(userName: string){
     let user: UserEntity = await this.userService.findByName(userName);
     if(!user)
       user = await this.userService.create({userName: userName});
@@ -76,7 +93,7 @@ export class DetectionsService {
   }
 
 
-  async getDetectionCameraAndLocation(cameraName: string, timestamp: Date) {
+  private async getDetectionCameraAndLocation(cameraName: string, timestamp: Date) {
     let camera: CameraEntity = await this.cameraService.findByName(cameraName);
     
 
@@ -89,34 +106,6 @@ export class DetectionsService {
     console.log(JSON.stringify(camera))
     cameraLocation = await this.cameraLocationService.findActiveByCameraId(camera.cameraId);
     console.log("ca dps do find")
-    // if (cameraLocation) {
-    //   console.log("cá")
-    //   console.log(JSON.stringify(cameraLocation))
-    //   if (cameraLocation.latitude != latitude || cameraLocation.longitude != longitude) {
-    //     console.log("teste aqui")
-    //     await this.cameraLocationService.update(cameraLocation.locationId, { isActive: false });
-    //     console.log(timestamp)
-    //     cameraLocation = await this.cameraLocationService.create({
-    //       camera: camera,
-    //       latitude: latitude,
-    //       longitude: longitude,
-    //       isActive: true,
-    //       timestamp: timestamp
-    //     });
-    //   }
-    // } else {
-    //   console.log("coá")
-    //   if(latitude && longitude)
-    //     cameraLocation = await this.cameraLocationService.create({
-    //       camera: camera,
-    //       latitude: latitude,
-    //       longitude: longitude,
-    //       isActive: true,
-    //       timestamp: timestamp
-    //     });
-      
-    // }
-
     return { camera, cameraLocation };
   }
 

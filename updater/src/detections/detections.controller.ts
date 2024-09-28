@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Get,
+  Param,
   Post,
   UploadedFile,
   UseInterceptors,
@@ -12,17 +13,26 @@ import { DetectionEntity } from './entities/detection.entity';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
+import { promises as fs } from 'fs'; // Importa o módulo fs
+import { HttpService } from '@nestjs/axios';
+import { firstValueFrom } from 'rxjs';
 
 @Controller('detections')
 export class DetectionsController {
-  constructor(private readonly detectionsService: DetectionsService) {}
+
+  private urlMonitorAPI = "http://localhost:3000/";
+
+  constructor(
+    private readonly detectionsService: DetectionsService,
+    private readonly httpService: HttpService
+  ) {}
 
   @Get()
   async getAll(): Promise<DetectionEntity[]> {
     return await this.detectionsService.findAll();
   }
 
-  @Post()
+  @Post() 
   @UseInterceptors(
     FileInterceptor('frame', {
       storage: diskStorage({
@@ -42,6 +52,45 @@ export class DetectionsController {
   ): Promise<DetectionEntity> {
     const detectionData: CreateDetectionDto = JSON.parse(detectionDataDto);
     const framePath = "imagens/frames/" + detectionFrame.filename;
-    return this.detectionsService.create(detectionData, framePath);
+    const detection: DetectionEntity = await this.detectionsService.getActiveDetectionByCameraNameAndCategory(detectionData.cameraName, detectionData.category);
+    if(!detection)
+      return this.detectionsService.create(detectionData, framePath);
+    else {
+      const filePath = `C:\\xampp\\htdocs\\dashboardcsis\\imagens\\frames\\${detectionFrame.filename}`;
+      try {
+        await fs.unlink(filePath); // Apaga o arquivo
+        console.log(`Arquivo ${filePath} excluído com sucesso.`);
+      } catch (error) {
+        console.error(`Erro ao excluir o arquivo: ${error.message}`);
+      }
+      return detection;
+    }
   }
+
+  @Post("close/:id")
+  async closeDetection(@Param('id') id: number,) {
+      const closedDetection: DetectionEntity = await this.detectionsService.closeDetection(id);
+      if(closedDetection){
+        console.log(closedDetection)
+        console.log("limpando cache:")
+        console.log(await this.notifyDetectionClosed(closedDetection.camera.name, closedDetection.category));
+      }
+      return "Fechado."
+  }
+
+  async notifyDetectionClosed(cameraName: string, category: string){
+    try {
+     const response = await firstValueFrom(
+          this.httpService.post(`${this.urlMonitorAPI}clear/${cameraName}/${category}`),
+      );
+      if(response?.status == 201)
+       return response.data;
+    } catch (error) {
+        console.log(error)
+        console.log("caiu aq no erro 53")
+        // console.error('Error fetching data from API', error);
+        throw error;
+    }
+  }
+
 }

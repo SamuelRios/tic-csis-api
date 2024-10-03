@@ -6,19 +6,24 @@ import * as fs from 'fs';
 import { CacheService } from '../cache/cache.service';
 import { SendDetectionDto } from 'src/dto/send-detection.dto';
 import { CategoryEnum } from 'src/enum/category.enum';
+import { ConfigService } from '@nestjs/config';
 // import * as path from 'path';
 
 @Injectable()
 export class ProcessorService {
 
-    private urlUpdaterApi = 'http://localhost:3001/detections';
+    private updaterApiUrl;
     // projectPath = path.resolve(__dirname);
-    private prefixImagePath = 'C:/Users/mucar/tic-csis-api/monitor/detection-images/'
+    private prefixImagePath;
 
     constructor(
+        private readonly config: ConfigService,
         private readonly cacheService: CacheService,
         private readonly httpService: HttpService
-    ) {}
+    ) {
+        this.prefixImagePath = config.get('PREFIX_IMG_PATH');
+        this.updaterApiUrl = config.get('UPDATER_API_URL');
+    }
 
     async process(jsonFile) {
         const timestamp: string = jsonFile.timestamp;
@@ -57,7 +62,7 @@ export class ProcessorService {
             formData.append('frame', fs.createReadStream( this.prefixImagePath + "camera1.png"));
 
            const response = await firstValueFrom(
-                this.httpService.post(this.urlUpdaterApi, formData, {
+                this.httpService.post(this.updaterApiUrl + "detections", formData, {
                     headers: {
                         ...formData.getHeaders(),
                     },

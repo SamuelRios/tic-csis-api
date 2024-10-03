@@ -5,9 +5,14 @@ import { Monitor } from './monitor/monitor';
 import { ProcessorService } from './services/processor/processor.service';
 import { HttpModule } from '@nestjs/axios';
 import { CacheService } from './services/cache/cache.service';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
-  imports: [ScheduleModule.forRoot(), HttpModule],
+  imports: [
+    ConfigModule.forRoot({isGlobal: true}),
+    ScheduleModule.forRoot(),
+    HttpModule
+  ],
   controllers: [AppController],
   providers: [Monitor, ProcessorService, CacheService],
 })

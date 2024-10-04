@@ -15,13 +15,19 @@ export class DetectionGateway {
   @WebSocketServer()
   server;
 
-  sendDetectionUpdate(detection: any) {
+  sendDetectionCreated(detection: any) {
     console.log(detection)
-    this.server.emit('detectionUpdate', detection);
+    this.server.emit('detectionCreated', detection);
   }
 
-  async handleConnection(client: any) {
+  private async handleConnection(client: any) {
     const activeDetections = await this.detectionService.getAllActiveDetections(); // Chama o método do serviço
     client.emit("activeDetections", activeDetections); // Envia as detecções ativas para o cliente
   }
+
+  sendDetectionClosed(detectionId: number) {
+    console.log("vou enviar notificação: " + detectionId);
+    this.server.emit('detectionClosed', detectionId);
+  }
+  
 }

@@ -14,17 +14,12 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
 import { promises as fs } from 'fs'; // Importa o módulo fs
-import { HttpService } from '@nestjs/axios';
-import { firstValueFrom } from 'rxjs';
 
 @Controller('detections')
 export class DetectionsController {
 
-  private urlMonitorAPI = "http://localhost:3000/";
-
   constructor(
     private readonly detectionsService: DetectionsService,
-    private readonly httpService: HttpService
   ) {}
 
   @Get('active')
@@ -70,28 +65,10 @@ export class DetectionsController {
 
   @Post("close/:id")
   async closeDetection(@Param('id') id: number,) {
-      const closedDetection: DetectionEntity = await this.detectionsService.closeDetection(id);
-      if(closedDetection){
-        console.log(closedDetection)
-        console.log("limpando cache:")
-        console.log(await this.notifyClosedDetection(closedDetection.camera.name, closedDetection.category));
-      }
+      console.log("aqui:::::::::::::::::::::")
+      await this.detectionsService.closeDetection(id);
       return "Fechado.";
   }
 
-  async notifyClosedDetection(cameraName: string, category: string){
-    try {
-     const response = await firstValueFrom(
-          this.httpService.post(`${this.urlMonitorAPI}detection/clear/${cameraName}/${category}`),
-      );
-      if(response?.status == 201)
-       return response.data;
-    } catch (error) {
-        console.log(error)
-        console.log("caiu aq no erro 53")
-        // console.error('Error fetching data from API', error);
-        throw error;
-    }
-  }
 
 }

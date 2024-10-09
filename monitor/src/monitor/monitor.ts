@@ -13,7 +13,7 @@ export class Monitor {
     private simulatedOnce: boolean = false;
 
     constructor(
-        private readonly fileProcessorService: ProcessorService,
+        private readonly processorService: ProcessorService,
     ) {}
 
     @Cron('* * * * * *')
@@ -29,19 +29,6 @@ export class Monitor {
                         const filePath = path.join(this.directoryPath, this.fileName);
                         const jsonFile = this.getJsonFromFile(filePath);
                         this.simulateModel(jsonFile)
-                        // await this.fileProcessorService.process({
-                        //     "timestamp": "2024-09-24 11:29:27",
-                        //     "detections": [
-                        //         {
-                        //             "class": 3,
-                        //             "confidence": 0.9404955506324768
-                        //         },
-                        //         {
-                        //             "class": 3,
-                        //             "confidence": 0.4982752799987793
-                        //         }
-                        //     ]
-                        // },)
                         console.log("finalizei")
                     } else console.log("\"" + this.fileName + "\" file not found");
                 }
@@ -55,9 +42,8 @@ export class Monitor {
     simulateModel(jsonFile){
         setTimeout(async () => {
             if(this.indexJobSimulator < jsonFile.length){
-                console.log('Iniciando da execução...');
-                console.log(jsonFile[this.indexJobSimulator])
-                await this.fileProcessorService.process(jsonFile[this.indexJobSimulator])
+                console.log('Iniciando a execução...');
+                await this.processorService.process(jsonFile[this.indexJobSimulator])
                 console.log('Fim da execução...');
                 this.indexJobSimulator++;
             }

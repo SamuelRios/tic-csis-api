@@ -13,7 +13,7 @@ import { DetectionEntity } from './entities/detection.entity';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
-import { promises as fs } from 'fs'; // Importa o módulo fs
+import { promises as fs } from 'fs';
 
 @Controller('detections')
 export class DetectionsController {
@@ -65,7 +65,7 @@ export class DetectionsController {
 
   @Post("close/:id")
   async closeDetection(@Param('id') id: number,) {
-      console.log("aqui:::::::::::::::::::::")
+      console.log("aqui:")
       await this.detectionsService.closeDetection(id);
       return "Fechado.";
   }

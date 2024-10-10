@@ -6,11 +6,11 @@ export class CategoryEnum {
         },
         {
             name:"graffiti",
-            debounceTTL: 30000,
+            debounceTTL: 300000,
         },
         {
             name:"gun",
-            debounceTTL: 30000,
+            debounceTTL: 300000,
         },
         {
             name:"fire",

@@ -47,20 +47,7 @@ export class DetectionsController {
   ): Promise<DetectionEntity> {
     const detectionData: CreateDetectionDto = JSON.parse(detectionDataDto);
     const framePath = "imagens/frames/" + detectionFrame.filename;
-    const detection: DetectionEntity = await this.detectionsService.getActiveDetectionByCameraNameAndCategory(detectionData.cameraName, detectionData.category);
-    if(!detection)
       return this.detectionsService.create(detectionData, framePath);
-    else {
-      console.log(detection)
-      const filePath = `C:\\xampp\\htdocs\\dashboardcsis\\imagens\\frames\\${detectionFrame.filename}`;
-      try {
-        await fs.unlink(filePath); // Apaga o arquivo
-        console.log(`Arquivo ${filePath} excluído com sucesso.`);
-      } catch (error) {
-        console.error(`Erro ao excluir o arquivo: ${error.message}`);
-      }
-      return detection;
-    }
   }
 
   @Post("close/:id")

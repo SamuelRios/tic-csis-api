@@ -4,8 +4,8 @@ import { CategoryEnum } from 'src/enum/category.enum';
 @Injectable()
 export class CacheService {
     
-    private cacheTTL = 60000;
-    private breakTime = 60000;
+    private cacheTTL = 6000;
+    private breakTime = 6000;
     private detectionsCache: Record<string, Record<number, { timestamp: number, lastChecked: number }>> = {};
 
     constructor() {
@@ -33,9 +33,9 @@ export class CacheService {
             const detectionData = cameraCache[detection.categoryNumber];
             if (detectionData) {
                 const { timestamp, lastChecked } = detectionData;
-                console.log(timestamp)
                 console.log(now)
-                console.log(now - timestamp)
+                console.log(lastChecked)
+                console.log(now - lastChecked)
                 if (now - timestamp <= this.cacheTTL && now - lastChecked <= CategoryEnum.getDebounceTTL(detection.categoryNumber)) {
                     detectionData.lastChecked = now;
                     return true;

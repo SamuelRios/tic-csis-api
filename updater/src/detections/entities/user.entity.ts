@@ -1,20 +1,23 @@
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
-import { Role } from '../enums/role.enum';
+import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, JoinColumn } from 'typeorm';
+import { RoleEntity } from './role.entity';
 
 @Entity({ name: 'users' })
 export class UserEntity {
 
-  @PrimaryGeneratedColumn({ name: 'user_id' })
-  userId: number;
+  @PrimaryGeneratedColumn({ name: 'id' })
+  id: number;
 
-  @Column({ name: 'user_name' })
-  userName: string;
+  @Column({ name: 'name' })
+  name: string;
 
-  @Column({
-    type: 'enum',
-    enum: Role,
-    default: Role.OPERADOR,
-  })
-  role: Role;
+  @Column({ name: 'email' })
+  email: string;
+
+  @Column({ name: 'password' })
+  password: string;
+
+  @ManyToOne(() => RoleEntity)
+  @JoinColumn({ name: 'role_id' })
+  roleId: RoleEntity;
   
 }

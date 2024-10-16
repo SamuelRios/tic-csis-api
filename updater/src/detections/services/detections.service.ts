@@ -1,4 +1,4 @@
-import { forwardRef, Inject, Injectable } from '@nestjs/common';
+import { forwardRef, Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Not, Repository } from 'typeorm';
 import { CreateDetectionDto } from '../dto/create-detection.dto';
@@ -40,6 +40,18 @@ export class DetectionsService {
   async findAll(): Promise<DetectionEntity[]> {
     return await this.detectionsRepository.find();
   }
+  async findOneById(id: number): Promise<DetectionEntity> {
+    
+    const detection = await this.detectionsRepository.findOne({
+      where: { id }, relations: ["status"]
+    });
+
+    if (!detection) {
+      throw new NotFoundException(`Detecção com ID ${id} não encontrada`);
+    }
+
+    return detection;
+  }
   
   // Método para retornar todas as detecções ativas
   async getAllActiveDetections(): Promise<DetectionEntity[]> {
@@ -50,21 +62,6 @@ export class DetectionsService {
         }
       },
       relations: ['camera', 'location', 'user', 'priority', 'status']
-    });
-  }
-
-  async getActiveDetectionByCameraNameAndCategory(cameraName: string, category: string): Promise<DetectionEntity | null> {
-    return await this.detectionsRepository.findOne({
-      where: {
-        camera: {
-          name: cameraName
-        },
-        category,
-        status: {
-          statusId: Not(2)
-        },
-      },
-      relations: ["status"]
     });
   }
 
@@ -79,23 +76,24 @@ export class DetectionsService {
     console.log("depois do get")
     console.log(JSON.stringify(camera))
     console.log(JSON.stringify(cameraLocation))
-    const detection = this.detectionsRepository.create();
+    const detection: DetectionEntity = this.detectionsRepository.create();
     detection.camera = camera;
-    detection.location = cameraLocation;
-    detection.category = cDetectionDto.category;
-    detection.framePath = framePath
-    // detection.priority = await this.getPriority(cDetectionDto.priorityName);
-    console.log("aqui antes do status")
     detection.status = await this.getStatus("Aberto");
-    detection.user = await this.getUser("Operador 01");
-    detection.timestamp = new Date(cDetectionDto.timestamp);
+    // detection.priority = await this.getPriority(cDetectionDto.priorityName);
+    detection.framePath = framePath;
+    detection.notes = "";
+    detection.createdAt = cDetectionDto.timestamp;
+    detection.updatedAt = cDetectionDto.timestamp;
+    detection.category = cDetectionDto.category;
+
+    console.log("aqui antes do status")
     const savedDetection = await this.detectionsRepository.save(detection);
     this.detectionGateway.sendDetectionCreated(savedDetection);
     return savedDetection;
   }
 
   async closeDetection(detectionId: number): Promise<DetectionEntity | null> {
-    const detection = await this.detectionsRepository.findOne({ where: { detectionId, status: {statusId: Not(2)} }, relations: ['camera'] });
+    const detection = await this.detectionsRepository.findOne({ where: { id: detectionId, status: {statusId: Not(2)} }, relations: ['camera'] });
     
     if (!detection) {
       return null;
@@ -136,7 +134,7 @@ export class DetectionsService {
   private async getUser(userName: string){
     let user: UserEntity = await this.userService.findByName(userName);
     if(!user)
-      user = await this.userService.create({userName: userName});
+      user = await this.userService.create({name: userName});
     return user;
   }
 
@@ -146,14 +144,10 @@ export class DetectionsService {
     
 
     if (!camera) {
-      camera = await this.cameraService.create({ name: cameraName, hasGps: true });
+      camera = await this.cameraService.create({ name: cameraName, hasGps: false });
     }
-    console.log("aqui")
     
-    let cameraLocation: CameraLocationEntity;
-    console.log(JSON.stringify(camera))
-    cameraLocation = await this.cameraLocationService.findActiveByCameraId(camera.cameraId);
-    console.log("ca dps do find")
+    let cameraLocation: CameraLocationEntity = await this.cameraLocationService.findActiveByCameraId(camera.cameraId);
     return { camera, cameraLocation };
   }
 

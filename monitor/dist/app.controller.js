@@ -21,14 +21,8 @@ let AppController = class AppController {
         this.cacheService = cacheService;
     }
     clearDetectionCache(cameraName, category) {
-        const detection = {
-            cameraName,
-            categoryNumber: category_enum_1.CategoryEnum.getCategoryNumber(category),
-            timestamp: undefined
-        };
-        console.log(this.cacheService);
-        this.cacheService.clearDetectionCache(detection);
-        console.log(this.cacheService);
+        const categoryNumber = category_enum_1.CategoryEnum.getCategoryNumber(category);
+        this.cacheService.deleteDetectionCache(cameraName, categoryNumber);
         console.log(`Cache limpo para a câmera: ${cameraName} e categoria: ${category}`);
         return `Cache limpo para a câmera: ${cameraName} e categoria: ${category}`;
     }

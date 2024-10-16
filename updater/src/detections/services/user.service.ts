@@ -11,7 +11,7 @@ export class UserService {
   ) {}
 
   async findByName(userName: string): Promise<UserEntity | undefined> {
-    return this.userRepository.findOne({ where: { userName: userName } });
+    return this.userRepository.findOne({ where: { name: userName } });
   }
 
   async create(userData: Partial<UserEntity>): Promise<UserEntity> {

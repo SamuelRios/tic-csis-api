@@ -33,7 +33,6 @@ export class Monitor {
                     } else console.log("\"" + this.fileName + "\" file not found");
                 }
             }
-            
         });
     }
 

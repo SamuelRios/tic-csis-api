@@ -27,6 +27,16 @@ export class DetectionsController {
     return this.detectionsService.getAllActiveDetections();
   }
 
+  @Get('isclosed/:id')
+  async isDetectionClosed(@Param('id') id: number): Promise<boolean> {
+    console.log("aqui no is closed router")
+    console.log(id)
+    const detection: DetectionEntity = await this.detectionsService.findOneById(id);
+    console.log(detection)
+    if(detection.status.statusId == 2) return true;
+    return false;
+  }
+
   @Post() 
   @UseInterceptors(
     FileInterceptor('frame', {
@@ -56,6 +66,8 @@ export class DetectionsController {
       await this.detectionsService.closeDetection(id);
       return "Fechado.";
   }
+
+  
 
 
 }

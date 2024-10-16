@@ -13,37 +13,38 @@ import { PriorityEntity } from './priority.entity';
 
 @Entity({ name: 'detections' })
 export class DetectionEntity {
-  @PrimaryGeneratedColumn({ name: 'detection_id' })
-  detectionId: number;
+  @PrimaryGeneratedColumn({ name: 'id' })
+  id: number;
 
   @ManyToOne(() => CameraEntity)
   @JoinColumn({ name: 'camera_id' })
   camera: CameraEntity;
 
-  @ManyToOne(() => CameraLocationEntity)
-  @JoinColumn({ name: 'location_id' })
-  location: CameraLocationEntity;
-
-  @Column()
-  category: string;
-  
-  @Column({ name: 'frame_path' })
-  framePath: string;
-  
   @ManyToOne(() => StatusEntity)
   @JoinColumn({ name: 'status_id' })
   status: StatusEntity;
 
-  
-
   @ManyToOne(() => PriorityEntity)
   @JoinColumn({ name: 'priority_id' })
   priority: PriorityEntity;
-  
+
   @ManyToOne(() => UserEntity)
-  @JoinColumn({ name: 'user_id' })
-  user: UserEntity;
+  @JoinColumn({ name: 'assigned_to' })
+  signedTo: UserEntity;
+
+  @Column({ name: 'detection_frame_url' })
+  framePath: string;
+
+  @Column({ type: 'text' })
+  notes: string;
+
+  @Column({ name: 'created_at' })
+  createdAt: Date;
+
+  @Column({ name: 'updated_at' })
+  updatedAt: Date;
 
   @Column()
-  timestamp: Date;
+  category: string;
+
 }

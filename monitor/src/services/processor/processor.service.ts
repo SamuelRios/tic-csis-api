@@ -35,12 +35,11 @@ export class ProcessorService {
                 timestamp: timestamp,
                 categoryNumber: detectionJson.class,
             }
-            if(!this.cacheService.isDetectionInCache(myDetection)){
+            if(!this.cacheService.isDetectionInCache("camera1", detectionJson.class)){
                 try {
-                    this.cacheService.setDetectionInCache(myDetection);
-                    console.log("vou salvar")
+                    console.log("vou enviar")
                     const response = await this.sendDetection(myDetection);
-                    if(!response) this.cacheService.clearDetectionCache(myDetection);
+                    if(response) this.cacheService.setDetectionInCache("camera1", detectionJson.class, response.id);
                 } catch {
                     console.log("agora eh na req")
                 }

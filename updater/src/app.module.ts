@@ -8,6 +8,9 @@ import { UserEntity } from './detections/entities/user.entity';
 import { PriorityEntity } from './detections/entities/priority.entity';
 import { StatusEntity } from './detections/entities/status.entity';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { DetectionChangesEntity } from './detections/entities/detectionChangesHistory.entity';
+import { DetectionNoteEntity } from './detections/entities/detectionNote.entity';
+import { RoleEntity } from './detections/entities/role.entity';
 
 @Module({
   imports: [
@@ -25,7 +28,17 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
         username: configService.get<string>('DB_USERNAME'),
         password: configService.get<string>('DB_PASSWORD'),
         database: configService.get<string>('DB_DATABASE'),
-        entities: [DetectionEntity, CameraEntity, CameraLocationEntity, UserEntity, PriorityEntity, StatusEntity],
+        entities: [
+          DetectionEntity,
+          CameraEntity,
+          CameraLocationEntity,
+          UserEntity,
+          PriorityEntity,
+          StatusEntity,
+          DetectionChangesEntity,
+          DetectionNoteEntity,
+          RoleEntity
+        ],
         synchronize: true,
       }),
     }),

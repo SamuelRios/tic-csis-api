@@ -3,7 +3,7 @@ import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
 @Entity({ name: 'priorities' })
 export class PriorityEntity {
 
-  @PrimaryGeneratedColumn({ name: 'priority_id' })
+  @PrimaryGeneratedColumn({ name: 'id' })
   priorityId: number;
 
   @Column({ name: 'priority_name' })

@@ -10,18 +10,10 @@ export class AppController {
   @Post('clear/:cameraName/:category')
   clearDetectionCache(
     @Param('cameraName') cameraName: string,
-    @Param('category') category: string
+    @Param('category') category: string,
   ) {
-    
-    const detection: Detection = {
-      cameraName,
-      categoryNumber: CategoryEnum.getCategoryNumber(category),
-      timestamp: undefined
-    }
-    console.log(this.cacheService)
-    this.cacheService.clearDetectionCache(detection)
-    ;
-    console.log(this.cacheService)
+    const categoryNumber = CategoryEnum.getCategoryNumber(category);
+    this.cacheService.deleteDetectionCache(cameraName, categoryNumber);
     console.log(`Cache limpo para a câmera: ${cameraName} e categoria: ${category}`)
     return `Cache limpo para a câmera: ${cameraName} e categoria: ${category}`;
   }

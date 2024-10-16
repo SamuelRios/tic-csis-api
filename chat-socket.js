@@ -38,7 +38,7 @@ const removeClosedDetection = (detectionId) => {
 const buildNewDetection = (detection) => {
   console.log(detection)
   const li = document.createElement("li");
-  li.appendChild(document.createTextNode(`Detection id: ${ detection.detectionId}; Category: ${detection.category}; Status:${detection.status.statusId}; Timestamp:${detection.timestamp}`))
+  li.appendChild(document.createTextNode(`Detection:${JSON.stringify(detection)}`))
   return li;
 }
 

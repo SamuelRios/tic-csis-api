@@ -11,11 +11,13 @@ import { PriorityService } from './priority.service';
 import { StatusService } from './status.service';
 import { UserService } from './user.service';
 import { StatusEntity } from '../entities/status.entity';
-import { UserEntity } from '../entities/user.entity';
+// import { UserEntity } from '../entities/user.entity';
 import { DetectionGateway } from '../gateways/detection/detection.gateway';
 import { HttpService } from '@nestjs/axios';
 import { firstValueFrom } from 'rxjs';
 import { ConfigService } from '@nestjs/config';
+import { PriorityEntity } from '../entities/priority.entity';
+import { ClassPriorityEnum } from '../enum/classPriority.enum';
 
 @Injectable()
 export class DetectionsService {
@@ -61,7 +63,7 @@ export class DetectionsService {
           statusId: Not(2)
         }
       },
-      relations: ['camera', 'location', 'user', 'priority', 'status']
+      relations: ['camera', 'location', 'signedTo', 'priority', 'status']
     });
   }
 
@@ -77,19 +79,27 @@ export class DetectionsService {
     console.log(JSON.stringify(camera))
     console.log(JSON.stringify(cameraLocation))
     const detection: DetectionEntity = this.detectionsRepository.create();
+    detection.category = cDetectionDto.category;
+    detection.signedTo = null;
+    detection.framePath = framePath;
+    detection.timestamp = cDetectionDto.timestamp;
+    detection.location = cameraLocation;
     detection.camera = camera;
     detection.status = await this.getStatus("Aberto");
-    // detection.priority = await this.getPriority(cDetectionDto.priorityName);
-    detection.framePath = framePath;
+    detection.priority = await this.getPriority(ClassPriorityEnum.getInitialPriority(cDetectionDto.category));
     detection.notes = "";
-    detection.createdAt = cDetectionDto.timestamp;
-    detection.updatedAt = cDetectionDto.timestamp;
-    detection.category = cDetectionDto.category;
-
-    console.log("aqui antes do status")
+    console.log("vou salvar detecção:")
+    console.log(detection)
     const savedDetection = await this.detectionsRepository.save(detection);
     this.detectionGateway.sendDetectionCreated(savedDetection);
     return savedDetection;
+  }
+
+  async getPriority(priorityName: string): Promise<PriorityEntity> {
+      let priority: PriorityEntity = await this.priorityService.findByName(priorityName);
+      if(!priority)
+        priority = await this.priorityService.create({priorityName: priorityName});
+      return priority;
   }
 
   async closeDetection(detectionId: number): Promise<DetectionEntity | null> {
@@ -131,12 +141,12 @@ export class DetectionsService {
     return status;
   }
 
-  private async getUser(userName: string){
-    let user: UserEntity = await this.userService.findByName(userName);
-    if(!user)
-      user = await this.userService.create({name: userName});
-    return user;
-  }
+  // private async getUser(userName: string){
+  //   let user: UserEntity = await this.userService.findByName(userName);
+  //   if(!user)
+  //     user = await this.userService.create({name: userName});
+  //   return user;
+  // }
 
 
   private async getDetectionCameraAndLocation(cameraName: string, timestamp: Date) {

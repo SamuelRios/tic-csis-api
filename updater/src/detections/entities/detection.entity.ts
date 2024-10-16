@@ -13,12 +13,19 @@ import { PriorityEntity } from './priority.entity';
 
 @Entity({ name: 'detections' })
 export class DetectionEntity {
-  @PrimaryGeneratedColumn({ name: 'id' })
+  @PrimaryGeneratedColumn({ name: 'detection_id' })
   id: number;
+   
+  @Column()
+  category: string;
 
   @ManyToOne(() => CameraEntity)
   @JoinColumn({ name: 'camera_id' })
   camera: CameraEntity;
+
+  @ManyToOne(() => CameraLocationEntity)
+  @JoinColumn({ name: 'location_id' })
+  location: CameraLocationEntity;
 
   @ManyToOne(() => StatusEntity)
   @JoinColumn({ name: 'status_id' })
@@ -38,13 +45,6 @@ export class DetectionEntity {
   @Column({ type: 'text' })
   notes: string;
 
-  @Column({ name: 'created_at' })
-  createdAt: Date;
-
-  @Column({ name: 'updated_at' })
-  updatedAt: Date;
-
-  @Column()
-  category: string;
-
+  @Column({ name: 'timestamp' })
+  timestamp: Date;
 }

@@ -38,6 +38,7 @@ import { RoleEntity } from './detections/entities/role.entity';
           DetectionChangesEntity,
           DetectionNoteEntity,
           RoleEntity
+          //SOMMMMMMMMM
         ],
         synchronize: true,
       }),

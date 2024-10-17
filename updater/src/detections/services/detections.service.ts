@@ -161,4 +161,27 @@ export class DetectionsService {
     return { camera, cameraLocation };
   }
 
+
+  async changeDetectionPriority(detectionId: number, newPriority:string){
+    const priority = await this.getPriority(newPriority);
+    if(priority){
+      const detection = await this.findOneById(detectionId);
+      if(detection){
+        detection.priority = priority;
+        return await this.detectionsRepository.save(detection);
+      }
+    }
+  }
+
+  async changeDetectionStatus(detectionId: number, newStatus:string){
+    const status = await this.getStatus(newStatus);
+    if(status){
+      const detection = await this.findOneById(detectionId);
+      if(detection){
+        detection.status = status;
+        return await this.detectionsRepository.save(detection);
+      }
+    }
+  }
+
 }

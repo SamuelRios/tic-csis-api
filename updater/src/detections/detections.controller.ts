@@ -14,12 +14,14 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
 import { promises as fs } from 'fs';
+import { CameraLocationService } from './services/cameraLocation.service';
 
 @Controller('detections')
 export class DetectionsController {
 
   constructor(
     private readonly detectionsService: DetectionsService,
+    private readonly locationService: CameraLocationService,
   ) {}
 
   @Get('active')
@@ -67,6 +69,20 @@ export class DetectionsController {
       return "Fechado.";
   }
 
+  @Post("changeprioriy/:id/:newPriority")
+  async changePriority(@Param('id') detectionId: number, @Param('newPriority') newPriority: string) {
+    return this.detectionsService.changeDetectionPriority(detectionId, newPriority);
+  }
+
+  @Post("changestatus/:id/:newstatus")
+  async changeStatus(@Param('id') detectionId: number, @Param('newstatus') newStatus: string) {
+    return this.detectionsService.changeDetectionStatus(detectionId, newStatus);
+  }
+
+  @Post("createlocation/")
+  async createLocation(@Body('data') locationDataDto: string) {
+    // return this.locationService.createLocation(locationDataDto);
+  }
   
 
 

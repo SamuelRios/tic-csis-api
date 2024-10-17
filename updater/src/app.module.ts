@@ -11,6 +11,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { DetectionChangesEntity } from './detections/entities/detectionChangesHistory.entity';
 import { DetectionNoteEntity } from './detections/entities/detectionNote.entity';
 import { RoleEntity } from './detections/entities/role.entity';
+import { UsersModule } from './users/users.module';
 
 @Module({
   imports: [
@@ -43,6 +44,7 @@ import { RoleEntity } from './detections/entities/role.entity';
         synchronize: true,
       }),
     }),
+    UsersModule,
   ],
   controllers: [],
   providers: [],

@@ -45,7 +45,7 @@ export class DetectionsService {
   async findOneById(id: number): Promise<DetectionEntity> {
     
     const detection = await this.detectionsRepository.findOne({
-      where: { id }, relations: ["status"]
+      where: { id }, relations: ['camera', 'location', 'assignedTo', 'priority', 'status']
     });
 
     if (!detection) {
@@ -63,7 +63,7 @@ export class DetectionsService {
           statusId: Not(2)
         }
       },
-      relations: ['camera', 'location', 'signedTo', 'priority', 'status']
+      relations: ['camera', 'location', 'assignedTo', 'priority', 'status']
     });
   }
 
@@ -80,7 +80,7 @@ export class DetectionsService {
     console.log(JSON.stringify(cameraLocation))
     const detection: DetectionEntity = this.detectionsRepository.create();
     detection.category = cDetectionDto.category;
-    detection.signedTo = null;
+    detection.assignedTo = null;
     detection.framePath = framePath;
     detection.timestamp = cDetectionDto.timestamp;
     detection.location = cameraLocation;

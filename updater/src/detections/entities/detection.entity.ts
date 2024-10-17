@@ -37,7 +37,7 @@ export class DetectionEntity {
 
   @ManyToOne(() => UserEntity)
   @JoinColumn({ name: 'assigned_to' })
-  signedTo: UserEntity;
+  assignedTo: UserEntity;
 
   @Column({ name: 'detection_frame_url' })
   framePath: string;

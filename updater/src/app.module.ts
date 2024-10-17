@@ -39,7 +39,6 @@ import { UsersModule } from './users/users.module';
           DetectionChangesEntity,
           DetectionNoteEntity,
           RoleEntity
-          //SOMMMMMMMMM
         ],
         synchronize: true,
       }),

@@ -29,6 +29,11 @@ export class DetectionsController {
     return this.detectionsService.getAllActiveDetections();
   }
 
+  @Get(":id")
+  async getDetectionById(@Param('id') id: number): Promise<DetectionEntity>{
+    return this.detectionsService.findOneById(id);
+  }
+
   @Get('isclosed/:id')
   async isDetectionClosed(@Param('id') id: number): Promise<boolean> {
     console.log("aqui no is closed router")
@@ -83,6 +88,8 @@ export class DetectionsController {
   async createLocation(@Body('data') locationDataDto: string) {
     // return this.locationService.createLocation(locationDataDto);
   }
+
+  
   
 
 

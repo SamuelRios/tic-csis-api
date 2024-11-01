@@ -16,7 +16,6 @@ export class DetectionGateway {
   server;
 
   sendDetectionCreated(detection: any) {
-    console.log(detection)
     this.server.emit('detectionCreated', detection);
   }
 

@@ -15,6 +15,7 @@ const processor_service_1 = require("./services/processor/processor.service");
 const axios_1 = require("@nestjs/axios");
 const cache_service_1 = require("./services/cache/cache.service");
 const config_1 = require("@nestjs/config");
+const detection_gateway_1 = require("./websockets/detection.gateway");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -26,7 +27,7 @@ exports.AppModule = AppModule = __decorate([
             axios_1.HttpModule
         ],
         controllers: [app_controller_1.AppController],
-        providers: [monitor_1.Monitor, processor_service_1.ProcessorService, cache_service_1.CacheService],
+        providers: [detection_gateway_1.DetectionsGateway, monitor_1.Monitor, processor_service_1.ProcessorService, cache_service_1.CacheService],
     })
 ], AppModule);
 //# sourceMappingURL=app.module.js.map

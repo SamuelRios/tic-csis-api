@@ -5,7 +5,7 @@ import {
     ManyToOne,
     JoinColumn,
   } from 'typeorm';
-  import { UserEntity } from './user.entity';
+  import { UserEntity } from '../../users/entities/user.entity';
   import { StatusEntity } from './status.entity';
   import { PriorityEntity } from './priority.entity';
 import { DetectionEntity } from './detection.entity';

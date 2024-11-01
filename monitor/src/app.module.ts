@@ -6,6 +6,7 @@ import { ProcessorService } from './services/processor/processor.service';
 import { HttpModule } from '@nestjs/axios';
 import { CacheService } from './services/cache/cache.service';
 import { ConfigModule } from '@nestjs/config';
+import { DetectionsGateway } from './websockets/detection.gateway';
 
 @Module({
   imports: [
@@ -14,6 +15,6 @@ import { ConfigModule } from '@nestjs/config';
     HttpModule
   ],
   controllers: [AppController],
-  providers: [Monitor, ProcessorService, CacheService],
+  providers: [DetectionsGateway, Monitor, ProcessorService, CacheService],
 })
 export class AppModule {}

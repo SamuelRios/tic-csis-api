@@ -1,7 +1,7 @@
 
 import { io } from "https://cdn.socket.io/4.7.5/socket.io.esm.min.js";
 
-const socket = io("ws://localhost:3001", { transports : ['websocket'] })
+const socket = io("ws://localhost:3000", { transports : ['websocket'] })
 const detections = document.getElementById('detections');
 
 socket.on('detectionCreated', (detection) => {
@@ -38,7 +38,7 @@ const removeClosedDetection = (detectionId) => {
 const buildNewDetection = (detection) => {
   console.log(detection)
   const li = document.createElement("li");
-  li.appendChild(document.createTextNode(`Detection:${JSON.stringify(detection)}`))
+  li.appendChild(document.createTextNode(`Detection:${JSON.stringify(detection, null, 4)}`))
   return li;
 }
 

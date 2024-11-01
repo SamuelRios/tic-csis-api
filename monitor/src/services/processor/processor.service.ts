@@ -25,21 +25,21 @@ export class ProcessorService {
         this.updaterApiUrl = config.get('UPDATER_API_URL');
     }
 
-    async process(jsonFile) {
-        const timestamp: string = jsonFile.timestamp;
-        const detections = jsonFile.detections;
-        let i = detections[0];
-        for(const detectionJson of detections){
+    async process(detectionsData, detectionFrame: Buffer) {
+        const timestamp: string = detectionsData.timestamp;
+        const detections = detectionsData.detections;
+        const cameraName =  detectionsData.camera ? detectionsData.camera : "Camera Default"
+        for(const detectionClass of detections){
             let myDetection = {
-                cameraName: "camera1",
+                cameraName: cameraName,
                 timestamp: timestamp,
-                categoryNumber: detectionJson.class,
+                categoryNumber: detectionClass.class
             }
-            if(!this.cacheService.isDetectionInCache("camera1", detectionJson.class)){
+            if(!this.cacheService.isDetectionInCache(cameraName, detectionClass.class)){
                 try {
                     console.log("vou enviar")
-                    const response = await this.sendDetection(myDetection);
-                    if(response) this.cacheService.setDetectionInCache("camera1", detectionJson.class, response.id);
+                    const response = await this.sendDetection(myDetection, detectionFrame);
+                    if(response) this.cacheService.setDetectionInCache(cameraName, detectionClass.class, response.id);
                 } catch {
                     console.log("agora eh na req")
                 }
@@ -47,18 +47,80 @@ export class ProcessorService {
         }
     }
 
-    async sendDetection(detection: Detection){
+    async sendDetection(detection: Detection, detectionFrame: Buffer): Promise<any> {
+        try {
+            const sendDetectionDto: SendDetectionDto = {
+                cameraName: detection.cameraName,
+                category: CategoryEnum.getCategoryName(detection.categoryNumber),
+                timestamp: detection.timestamp
+            }
+            const form = new FormData();
+            form.append('frame', detectionFrame, {
+                filename: 'frame.png',
+                contentType: 'image/png',
+              });
+            
+            form.append('detectionData', JSON.stringify(sendDetectionDto));
+
+            const response = await firstValueFrom(
+                this.httpService.post(this.updaterApiUrl + "detections", form, // Dados do formulário
+                    {
+                    headers: {
+                        ...form.getHeaders(), // Headers do form-data
+                    },
+                    }
+                ),
+            );
+            if(response?.status == 201){
+                console.log("Decção enviada.")
+            } else {
+                console.log("Erro ao salvar detecção ::::::::::::::::::::::::::::::~~~~")
+            }
+            return response.data;
+        } catch (error) {
+            console.log("ERROR: sendDetection")
+
+          throw new Error(error.response?.data || 'Error sending JSON data');
+        }
+      }
+
+      
+
+    async processSavedImg(detectionsData) {
+        const timestamp: string = detectionsData.timestamp;
+        const detections = detectionsData.detections;
+        const cameraName =  detectionsData.camera ? detectionsData.camera : "Camera Default"
+        for(const detectionClass of detections){
+            let myDetection = {
+                cameraName: cameraName,
+                timestamp: timestamp,
+                categoryNumber: detectionClass.class
+            }
+            if(!this.cacheService.isDetectionInCache(cameraName, detectionClass.class)){
+                try {
+                    console.log("vou enviar")
+                    const response = await this.sendDetectionSavedImg(myDetection);
+                    if(response) this.cacheService.setDetectionInCache(cameraName, detectionClass.class, response.id);
+                } catch {
+                    console.log("agora eh na req")
+                }
+            }
+        }
+    }
+
+    async sendDetectionSavedImg(detection: Detection){
         try {
             const formData = new FormData();
+            const categoryName = CategoryEnum.getCategoryName(detection.categoryNumber);
 
             const sendDetectionDto: SendDetectionDto = {
                 cameraName: detection.cameraName,
                 category: CategoryEnum.getCategoryName(detection.categoryNumber),
                 timestamp: detection.timestamp
             }
-            formData.append('data', JSON.stringify(sendDetectionDto));
-            
-            formData.append('frame', fs.createReadStream( this.prefixImagePath + "camera1.png"));
+            formData.append('detectionData', JSON.stringify(sendDetectionDto));
+            console.log(this.prefixImagePath + categoryName +`/${detection.cameraName}_detection_${detection.timestamp.replace(" ","_").replace(/:/g, "-")}.png`)
+            formData.append('frame', fs.createReadStream(this.prefixImagePath + categoryName +`/${detection.cameraName}_detection_${detection.timestamp.replace(" ","_").replace(/:/g, "-")}`));
 
            const response = await firstValueFrom(
                 this.httpService.post(this.updaterApiUrl + "detections", formData, {

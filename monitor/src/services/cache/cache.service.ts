@@ -48,10 +48,6 @@ export class CacheService {
         if (cameraCache) {
             const detectionCache = cameraCache[categoryNumber];
             if (detectionCache) {
-                console.log(now);
-                console.log(detectionCache.lastCheckedClosedDetection);
-                console.log(now - detectionCache.lastCheckedClosedDetection);
-
                 // Verifica se a detecção é válida com base no TTL e debounce
                 if (now - detectionCache.lastCheckedClosedDetection <= this.cacheTTL &&
                     now - detectionCache.lastCheckedDebounce <= CategoryEnum.getDebounceTTL(categoryNumber)) {
@@ -118,8 +114,6 @@ export class CacheService {
             const response = await firstValueFrom(
                 this.httpService.get(this.updaterApiUrl + `detections/isclosed/${detectionId}`)
             );
-            console.log("BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB ")
-            console.log(response.data)
             if(response?.status == 200)
                 return !!response.data;
             return true; // Retorna o conteúdo da resposta

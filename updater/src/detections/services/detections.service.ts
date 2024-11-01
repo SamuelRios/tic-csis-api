@@ -9,10 +9,10 @@ import { CameraLocationService } from './cameraLocation.service';
 import { CameraLocationEntity } from '../entities/cameraLocation.entity';
 import { PriorityService } from './priority.service';
 import { StatusService } from './status.service';
-import { UserService } from './user.service';
+import { UserService } from '../../users/services/user.service';
 import { StatusEntity } from '../entities/status.entity';
 // import { UserEntity } from '../entities/user.entity';
-import { DetectionGateway } from '../gateways/detection/detection.gateway';
+import { DetectionGateway } from '../websockets/detection/detection.gateway';
 import { HttpService } from '@nestjs/axios';
 import { firstValueFrom } from 'rxjs';
 import { ConfigService } from '@nestjs/config';
@@ -30,7 +30,6 @@ export class DetectionsService {
     private readonly cameraLocationService: CameraLocationService,
     private readonly priorityService: PriorityService,
     private readonly statusService: StatusService,
-    private readonly userService: UserService,
     @Inject(forwardRef(() => DetectionGateway))
     private readonly detectionGateway: DetectionGateway,
     private readonly httpService: HttpService,
@@ -72,24 +71,21 @@ export class DetectionsService {
     framePath: string
   ): Promise<DetectionEntity> {
     console.log(cDetectionDto.timestamp);
+    const detectionTimestamp = new Date(cDetectionDto.timestamp);
     const { camera, cameraLocation } = await this.getDetectionCameraAndLocation(
-      cDetectionDto.cameraName, cDetectionDto.timestamp
+      cDetectionDto.cameraName, detectionTimestamp
     );
-    console.log("depois do get")
-    console.log(JSON.stringify(camera))
-    console.log(JSON.stringify(cameraLocation))
     const detection: DetectionEntity = this.detectionsRepository.create();
     detection.category = cDetectionDto.category;
     detection.assignedTo = null;
     detection.framePath = framePath;
-    detection.timestamp = cDetectionDto.timestamp;
+    detection.timestamp = detectionTimestamp;
     detection.location = cameraLocation;
     detection.camera = camera;
     detection.status = await this.getStatus("Aberto");
     detection.priority = await this.getPriority(ClassPriorityEnum.getInitialPriority(cDetectionDto.category));
     detection.notes = "";
-    console.log("vou salvar detecção:")
-    console.log(detection)
+    console.log("vou salvar detecção")
     const savedDetection = await this.detectionsRepository.save(detection);
     this.detectionGateway.sendDetectionCreated(savedDetection);
     return savedDetection;
@@ -127,8 +123,7 @@ export class DetectionsService {
       if(response?.status == 201)
        return response.data;
     } catch (error) {
-        console.log(error)
-        console.log("caiu aq no erro 53")
+        console.log("ERRO: notifyClosedDetection")
         // console.error('Error fetching data from API', error);
         throw error;
     }

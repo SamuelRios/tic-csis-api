@@ -19,5 +19,8 @@ export class UserEntity {
   @ManyToOne(() => RoleEntity)
   @JoinColumn({ name: 'role_id' })
   roleId: RoleEntity;
+
+  @Column({name:"created_at"})
+  createdAt: Date;
   
 }

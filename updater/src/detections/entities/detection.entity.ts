@@ -7,7 +7,7 @@ import {
 } from 'typeorm';
 import { CameraEntity } from './camera.entity';
 import { CameraLocationEntity } from './cameraLocation.entity';
-import { UserEntity } from './user.entity';
+import { UserEntity } from '../../users/entities/user.entity';
 import { StatusEntity } from './status.entity';
 import { PriorityEntity } from './priority.entity';
 

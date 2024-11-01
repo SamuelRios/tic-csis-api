@@ -13,15 +13,14 @@ import { DetectionEntity } from './entities/detection.entity';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
-import { promises as fs } from 'fs';
-import { CameraLocationService } from './services/cameraLocation.service';
+import { writeFile } from 'fs/promises';
+import * as path from 'path';
 
 @Controller('detections')
 export class DetectionsController {
 
   constructor(
     private readonly detectionsService: DetectionsService,
-    private readonly locationService: CameraLocationService,
   ) {}
 
   @Get('active')
@@ -39,12 +38,31 @@ export class DetectionsController {
     console.log("aqui no is closed router")
     console.log(id)
     const detection: DetectionEntity = await this.detectionsService.findOneById(id);
-    console.log(detection)
     if(detection.status.statusId == 2) return true;
     return false;
   }
 
-  @Post() 
+  @Post()
+  @UseInterceptors(FileInterceptor('frame'))
+  async createWithImg(@UploadedFile() frame: Express.Multer.File, @Body('detectionData') detectionData: string): Promise<DetectionEntity> {
+    const detection = JSON.parse(detectionData);
+    // Define o caminho onde a imagem será salva
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
+    const ext = extname(detection.cameraName);
+    const filename = `${uniqueSuffix}${ext}`;
+    const imagePath = path.join("C:/xampp/htdocs/dashboardcsis/imagens/frames", filename +  ".png");
+    const framePath = "imagens/frames/" + filename;
+    if(!frame){
+      console.log("não há imagens")
+    } else 
+      await writeFile(imagePath, frame.buffer);
+
+    return this.detectionsService.create(detection, framePath);
+
+  }
+
+
+  @Post('withoutimginjson') 
   @UseInterceptors(
     FileInterceptor('frame', {
       storage: diskStorage({
@@ -58,7 +76,7 @@ export class DetectionsController {
       }),
     })
   )
-  async create(
+  async createWithoutImg(
     @UploadedFile() detectionFrame: Express.Multer.File,
     @Body('data') detectionDataDto: string,
   ): Promise<DetectionEntity> {
@@ -69,7 +87,6 @@ export class DetectionsController {
 
   @Post("close/:id")
   async closeDetection(@Param('id') id: number,) {
-      console.log("aqui:")
       await this.detectionsService.closeDetection(id);
       return "Fechado.";
   }

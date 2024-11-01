@@ -16,25 +16,25 @@ export class Monitor {
         private readonly processorService: ProcessorService,
     ) {}
 
-    @Cron('* * * * * *')
-    handleCron() {
-        fs.readdir(this.directoryPath, async (err, files) => {
-            if(!this.simulatedOnce){
-                if (err) {
-                    console.log('Erro ao ler o diretório: ', err.message);
-                } else {
-                    this.simulatedOnce = true;
-                    console.log("run:")
-                    if(files.findIndex(fileName => fileName == this.fileName) > -1){ 
-                        const filePath = path.join(this.directoryPath, this.fileName);
-                        const jsonFile = this.getJsonFromFile(filePath);
-                        this.simulateModel(jsonFile)
-                        console.log("finalizei")
-                    } else console.log("\"" + this.fileName + "\" file not found");
-                }
-            }
-        });
-    }
+    // @Cron('* * * * * *')
+    // handleCron() {
+        // fs.readdir(this.directoryPath, async (err, files) => {
+        //     if(!this.simulatedOnce){
+        //         if (err) {
+        //             console.log('Erro ao ler o diretório: ', err.message);
+        //         } else {
+        //             this.simulatedOnce = true;
+        //             console.log("run:")
+        //             if(files.findIndex(fileName => fileName == this.fileName) > -1){ 
+        //                 const filePath = path.join(this.directoryPath, this.fileName);
+        //                 const jsonFile = this.getJsonFromFile(filePath);
+        //                 this.simulateModel(jsonFile)
+        //                 console.log("finalizei")
+        //             } else console.log("\"" + this.fileName + "\" file not found");
+        //         }
+        //     }
+        // });
+    // }
 
     private indexJobSimulator: number = 0;
 
@@ -42,7 +42,7 @@ export class Monitor {
         setTimeout(async () => {
             if(this.indexJobSimulator < jsonFile.length){
                 console.log('Iniciando a execução...');
-                await this.processorService.process(jsonFile[this.indexJobSimulator])
+                // await this.processorService.process(jsonFile[this.indexJobSimulator])
                 console.log('Fim da execução...');
                 this.indexJobSimulator++;
             }

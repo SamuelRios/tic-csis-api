@@ -1,5 +1,15 @@
+import { IsNotEmpty, IsString } from 'class-validator';
+
 export class CreateDetectionDto {
-    cameraName: string
-    category: string
-    timestamp: Date
+  @IsNotEmpty()
+  @IsString()
+  cameraName: string;
+
+  @IsNotEmpty()
+  @IsString()
+  category: string;
+
+  @IsNotEmpty()
+  @IsString()
+  timestamp: string;
 }

@@ -7,17 +7,14 @@ import { CameraService } from './services/camera.service';
 import { CameraLocationService } from './services/cameraLocation.service';
 import { CameraEntity } from './entities/camera.entity';
 import { CameraLocationEntity } from './entities/cameraLocation.entity';
-import { UserEntity } from './entities/user.entity';
 import { PriorityEntity } from './entities/priority.entity';
 import { StatusEntity } from './entities/status.entity';
 import { PriorityService } from './services/priority.service';
 import { StatusService } from './services/status.service';
-import { UserService } from './services/user.service';
 import { HttpModule } from '@nestjs/axios';
-import { DetectionGateway } from './gateways/detection/detection.gateway';
+import { DetectionGateway } from './websockets/detection/detection.gateway';
 import { DetectionChangesEntity } from './entities/detectionChangesHistory.entity';
 import { DetectionNoteEntity } from './entities/detectionNote.entity';
-import { RoleEntity } from './entities/role.entity';
 
 @Module({
   imports: [
@@ -26,12 +23,10 @@ import { RoleEntity } from './entities/role.entity';
         DetectionEntity,
         CameraEntity,
         CameraLocationEntity,
-        UserEntity,
         PriorityEntity,
         StatusEntity,
         DetectionChangesEntity,
         DetectionNoteEntity,
-        RoleEntity
       ]
     ),
     HttpModule,
@@ -43,7 +38,6 @@ import { RoleEntity } from './entities/role.entity';
     CameraLocationService,
     PriorityService,
     StatusService,
-    UserService,
     DetectionGateway
   ],
 })

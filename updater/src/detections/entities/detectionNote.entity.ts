@@ -1,6 +1,6 @@
 import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, JoinColumn } from 'typeorm';
 import { DetectionEntity } from './detection.entity';
-import { UserEntity } from './user.entity';
+import { UserEntity } from '../../users/entities/user.entity';
 
 @Entity({ name: 'detection_notes' })
 export class DetectionNoteEntity {

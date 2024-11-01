@@ -20,4 +20,12 @@ export class PriorityService {
     const newOperator = this.priorityRepository.create(priorityData);
     return this.priorityRepository.save(newOperator);
   }
+  
+  async findAll(): Promise<PriorityEntity[]> {
+    return await this.priorityRepository.find();
+  }
+
+  async findById(id: number){
+    return await this.priorityRepository.findOne({ where: { priorityId: id } })
+  }
 }

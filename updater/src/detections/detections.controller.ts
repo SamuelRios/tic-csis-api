@@ -3,6 +3,7 @@ import {
   Controller,
   Get,
   Param,
+  Patch,
   Post,
   UploadedFile,
   UseInterceptors,
@@ -15,17 +16,42 @@ import { diskStorage } from 'multer';
 import { extname } from 'path';
 import { writeFile } from 'fs/promises';
 import * as path from 'path';
+import { StatusEntity } from './entities/status.entity';
+import { StatusService } from './services/status.service';
+import { PriorityEntity } from './entities/priority.entity';
+import { PriorityService } from './services/priority.service';
+import { UpdateDetectionDto } from './dto/update-detection.dto';
 
 @Controller('detections')
 export class DetectionsController {
 
   constructor(
     private readonly detectionsService: DetectionsService,
+    private readonly statusService: StatusService,
+    private readonly priorityService: PriorityService,
   ) {}
 
   @Get('active')
   async getActiveDetections(): Promise<DetectionEntity[]> {
     return this.detectionsService.getAllActiveDetections();
+  }
+
+  @Get('getallstatuses')
+  async getAllStatuses(): Promise<StatusEntity[]> {
+    return await this.statusService.findAll();
+  }
+
+  @Get('getallpriorities')
+  async getAllPriorities(): Promise<PriorityEntity[]> {
+    return await this.priorityService.findAll();
+  }
+
+  @Patch(':id')
+  async updateDetection(
+    @Param('id') id: number,
+    @Body() updateDetectionDto: UpdateDetectionDto
+  ): Promise<DetectionEntity> {
+    return await this.detectionsService.updateDetection(id, updateDetectionDto);
   }
 
   @Get(":id")
@@ -91,7 +117,7 @@ export class DetectionsController {
       return "Fechado.";
   }
 
-  @Post("changeprioriy/:id/:newPriority")
+  @Post("changepriority/:id/:newPriority")
   async changePriority(@Param('id') detectionId: number, @Param('newPriority') newPriority: string) {
     return this.detectionsService.changeDetectionPriority(detectionId, newPriority);
   }
@@ -105,9 +131,4 @@ export class DetectionsController {
   async createLocation(@Body('data') locationDataDto: string) {
     // return this.locationService.createLocation(locationDataDto);
   }
-
-  
-  
-
-
 }

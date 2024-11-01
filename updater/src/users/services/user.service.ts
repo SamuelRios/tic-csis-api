@@ -43,7 +43,7 @@ export class UserService {
 
   // Get all users
   async findAll(): Promise<UserEntity[]> {
-    return await this.userRepository.find({ relations: ['roleId'] });
+    return await this.userRepository.find();
   }
 
   // Get user by ID
@@ -87,5 +87,9 @@ export class UserService {
     if (result.affected === 0) {
       throw new NotFoundException(`User with ID ${id} not found`);
     }
+  }
+
+  async findById(id: number){
+    return await this.userRepository.findOne({ where: { id } })
   }
 }

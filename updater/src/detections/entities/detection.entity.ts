@@ -41,10 +41,7 @@ export class DetectionEntity {
 
   @Column({ name: 'detection_frame_url' })
   framePath: string;
-
-  @Column({ type: 'text' })
-  notes: string;
-
+  
   @Column({ name: 'timestamp' })
   timestamp: Date;
 }

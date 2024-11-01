@@ -5,7 +5,7 @@ import { UserEntity } from '../../users/entities/user.entity';
 @Entity({ name: 'detection_notes' })
 export class DetectionNoteEntity {
 
-  @PrimaryGeneratedColumn({ name: 'id' })
+  @PrimaryGeneratedColumn({ name: 'note_id' })
   id: number;
 
   @ManyToOne(() => DetectionEntity)
@@ -16,7 +16,7 @@ export class DetectionNoteEntity {
   @JoinColumn({ name: 'user_id' })
   user: UserEntity;
 
-  @Column({ type: 'text' })
+  @Column({ name: "note_text", type: 'text' })
   note: string;
 
   @Column({ name: 'created_at' })

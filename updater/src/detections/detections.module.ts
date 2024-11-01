@@ -15,6 +15,7 @@ import { HttpModule } from '@nestjs/axios';
 import { DetectionGateway } from './websockets/detection/detection.gateway';
 import { DetectionChangesEntity } from './entities/detectionChangesHistory.entity';
 import { DetectionNoteEntity } from './entities/detectionNote.entity';
+import { UsersModule } from 'src/users/users.module';
 
 @Module({
   imports: [
@@ -30,6 +31,7 @@ import { DetectionNoteEntity } from './entities/detectionNote.entity';
       ]
     ),
     HttpModule,
+    UsersModule
   ],
   controllers: [DetectionsController],
   providers: [

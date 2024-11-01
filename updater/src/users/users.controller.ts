@@ -3,6 +3,7 @@ import { UserEntity } from './entities/user.entity';
 import { UserService } from './services/user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { plainToInstance } from 'class-transformer';
 
 @Controller('users')
 export class UsersController {
@@ -19,8 +20,9 @@ export class UsersController {
 
   // Retorna todos os usuários
   @Get()
-  async findAll(): Promise<UserEntity[]> {
-    return await this.usersService.findAll();
+  async getAllUsers(): Promise<UserEntity[]> {
+    const users = await this.usersService.findAll();
+    return users.map(user => plainToInstance(UserEntity, user));
   }
 
   // Retorna um usuário pelo ID

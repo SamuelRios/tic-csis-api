@@ -12,7 +12,7 @@ import { DetectionEntity } from './detection.entity';
   
   @Entity({ name: 'detection_changes_history' })
   export class DetectionChangesEntity {
-    @PrimaryGeneratedColumn({ name: 'id' })
+    @PrimaryGeneratedColumn({ name: 'history_id' })
     id: number;
   
     @ManyToOne(() => DetectionEntity)
@@ -20,7 +20,7 @@ import { DetectionEntity } from './detection.entity';
     detection: DetectionEntity;
 
     @ManyToOne(() => UserEntity)
-    @JoinColumn({ name: 'changed_By' })
+    @JoinColumn({ name: 'changed_by_user_id' })
     changedBy: UserEntity;
   
     @ManyToOne(() => StatusEntity)
@@ -40,11 +40,11 @@ import { DetectionEntity } from './detection.entity';
     newPriority: PriorityEntity;
 
     @ManyToOne(() => UserEntity)
-    @JoinColumn({ name: 'previous_assigned_to' })
+    @JoinColumn({ name: 'previous_responsible_id' })
     previousAssignedTo: UserEntity;
 
     @ManyToOne(() => UserEntity)
-    @JoinColumn({ name: 'new_assigned_to' })
+    @JoinColumn({ name: 'new_responsible_id' })
     newAssignedTo: UserEntity;
   
     @Column({ name: 'changed_at' })

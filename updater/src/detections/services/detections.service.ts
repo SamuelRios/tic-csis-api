@@ -18,6 +18,10 @@ import { firstValueFrom } from 'rxjs';
 import { ConfigService } from '@nestjs/config';
 import { PriorityEntity } from '../entities/priority.entity';
 import { ClassPriorityEnum } from '../enum/classPriority.enum';
+import { UpdateDetectionDto } from '../dto/update-detection.dto';
+import { DetectionChangesEntity } from '../entities/detectionChangesHistory.entity';
+import { UserEntity } from 'src/users/entities/user.entity';
+import { DetectionNoteEntity } from '../entities/detectionNote.entity';
 
 @Injectable()
 export class DetectionsService {
@@ -26,10 +30,15 @@ export class DetectionsService {
   constructor(
     @InjectRepository(DetectionEntity)
     private detectionsRepository: Repository<DetectionEntity>,
+    @InjectRepository(DetectionChangesEntity)
+    private detectionChangesRepository: Repository<DetectionChangesEntity>,
+    @InjectRepository(DetectionNoteEntity)
+    private readonly detectionNoteRepository: Repository<DetectionNoteEntity>,
     private readonly cameraService: CameraService,
     private readonly cameraLocationService: CameraLocationService,
     private readonly priorityService: PriorityService,
     private readonly statusService: StatusService,
+    private readonly userService: UserService,
     @Inject(forwardRef(() => DetectionGateway))
     private readonly detectionGateway: DetectionGateway,
     private readonly httpService: HttpService,
@@ -54,7 +63,6 @@ export class DetectionsService {
     return detection;
   }
   
-  // Método para retornar todas as detecções ativas
   async getAllActiveDetections(): Promise<DetectionEntity[]> {
     return this.detectionsRepository.find({
       where: {
@@ -84,7 +92,6 @@ export class DetectionsService {
     detection.camera = camera;
     detection.status = await this.getStatus("Aberto");
     detection.priority = await this.getPriority(ClassPriorityEnum.getInitialPriority(cDetectionDto.category));
-    detection.notes = "";
     console.log("vou salvar detecção")
     const savedDetection = await this.detectionsRepository.save(detection);
     this.detectionGateway.sendDetectionCreated(savedDetection);
@@ -179,4 +186,77 @@ export class DetectionsService {
     }
   }
 
+  async updateDetection(
+    id: number,
+    updateDetectionDto: UpdateDetectionDto
+  ): Promise<DetectionEntity> {
+    const detection = await this.detectionsRepository.findOne({ where: { id }, relations: ["status", "priority", "assignedTo"] });
+    if (!detection) {
+      throw new Error('Detection not found');
+    }
+
+    const changes: Partial<DetectionChangesEntity> = {
+      detection,
+      changedBy: null,
+      // changedBy: updateDetectionDto.assignedToId ? await this.findUser(updateDetectionDto.assignedToId) : detection.assignedTo,
+      changedAt: new Date(),
+    };
+
+    let hasChanges = false;
+
+    if (updateDetectionDto.statusId && updateDetectionDto.statusId !== detection.status.statusId) {
+      changes.previousStatus = detection.status;
+      changes.newStatus = await this.findStatus(updateDetectionDto.statusId);
+      detection.status = changes.newStatus;
+      hasChanges = true;
+    }
+
+    if (updateDetectionDto.priorityId && updateDetectionDto.priorityId !== detection.priority.priorityId) {
+      changes.previousPriority = detection.priority;
+      changes.newPriority = await this.findPriority(updateDetectionDto.priorityId);
+      detection.priority = changes.newPriority;
+      hasChanges = true;
+    }
+
+    if (updateDetectionDto.assignedToId && detection.assignedTo && updateDetectionDto.assignedToId !== detection.assignedTo.id) {
+      changes.previousAssignedTo = detection.assignedTo;
+      changes.newAssignedTo = await this.findUser(updateDetectionDto.assignedToId);
+      detection.assignedTo = changes.newAssignedTo;
+      hasChanges = true;
+    }
+
+    if(updateDetectionDto.note){
+      await this.createNote(detection, null, updateDetectionDto.note );
+    }
+
+    if (hasChanges) {
+      await this.detectionsRepository.save(detection);
+      await this.detectionChangesRepository.save(changes);
+    }
+
+    return detection;
+  }
+
+  private async createNote(detection: DetectionEntity, user: UserEntity, note: string): Promise<DetectionNoteEntity> {
+    const newNote = this.detectionNoteRepository.create({
+      detection,
+      user,
+      note,
+      createdAt: new Date(),
+    });
+
+    return await this.detectionNoteRepository.save(newNote);
+  }
+
+  private async findStatus(id: number): Promise<StatusEntity> {
+    return await this.statusService.findById(id);
+  }
+
+  private async findPriority(id: number): Promise<PriorityEntity> {
+    return await this.priorityService.findById(id);
+  }
+
+  private async findUser(id: number): Promise<UserEntity> {
+    return await this.userService.findById(id);
+  }
 }

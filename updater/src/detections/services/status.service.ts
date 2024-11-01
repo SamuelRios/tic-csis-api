@@ -20,4 +20,12 @@ export class StatusService {
     const newOperator = this.statusRepository.create(statusData);
     return this.statusRepository.save(newOperator);
   }
+
+  async findAll(): Promise<StatusEntity[]> {
+    return await this.statusRepository.find();
+  }
+
+  async findById(id: number){
+    return await this.statusRepository.findOne({ where: { statusId: id } })
+  }
 }

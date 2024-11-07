@@ -16,13 +16,13 @@ export class CacheService {
         private readonly config: ConfigService,
         private readonly httpService: HttpService,
     ) {
-        this.updaterApiUrl = config.get('UPDATER_API_URL');
+        this.updaterApiUrl = this.config.get('UPDATER_API_URL');
         // Intervalo para limpar o cache automaticamente
         setInterval(() => this.cleanExpiredCache(), this.checkIntervalTime);
     }
 
     // Define a última detecção no cache para uma categoria de uma câmera
-    setDetectionInCache(cameraName: string, categoryNumber: number, detectionId: number) {
+    public setDetectionInCache(cameraName: string, categoryNumber: number, detectionId: number) {
         const now = Date.now();
         let cameraCache = this.detectionsCache[cameraName];
 
@@ -40,25 +40,29 @@ export class CacheService {
     }
 
     // Verifica se uma detecção já está no cache
-    isDetectionInCache(cameraName: string, categoryNumber: number): boolean {
+    public async isDetectionInCache(cameraName: string, categoryNumber: number): Promise<boolean> {
         console.log("Verificando se está no cache");
         const cameraCache = this.detectionsCache[cameraName];
         const now = Date.now();
 
         if (cameraCache) {
             const detectionCache = cameraCache[categoryNumber];
+    
             if (detectionCache) {
                 // Verifica se a detecção é válida com base no TTL e debounce
-                if (now - detectionCache.lastCheckedClosedDetection <= this.cacheTTL &&
-                    now - detectionCache.lastCheckedDebounce <= CategoryEnum.getDebounceTTL(categoryNumber)) {
-                    
-                    // Atualiza o tempo de verificação
-                    detectionCache.lastCheckedClosedDetection = now;
-                    return true;
-                } else {
-                    // Limpa o cache se a detecção estiver expirada
+
+                if(now - detectionCache.lastCheckedDebounce > CategoryEnum.getDebounceTTL(categoryNumber)) {
                     this.deleteDetectionCache(cameraName, categoryNumber);
                     return false;
+                } // Atualiza o tempo de verificação
+                else detectionCache.lastCheckedDebounce = now;
+
+                if (now - detectionCache.lastCheckedClosedDetection > this.cacheTTL){
+                    if(await this.isDetectionClosed(detectionCache.detectionId)){
+                        this.deleteDetectionCache(cameraName, categoryNumber)
+                        return false;
+                    }
+                    else detectionCache.lastCheckedClosedDetection = now;
                 }
             }
         }
@@ -66,7 +70,7 @@ export class CacheService {
     }
 
     // Limpa o cache para uma categoria específica de uma câmera
-    deleteDetectionCache(cameraName: string, categoryNumber: number) {
+    public deleteDetectionCache(cameraName: string, categoryNumber: number) {
         console.log("Limpando detecção do cache");
         const cameraCache = this.detectionsCache[cameraName];
         if (cameraCache) {
@@ -80,7 +84,7 @@ export class CacheService {
     }
 
     // Limpa detecções expiradas do cache
-    async cleanExpiredCache() {
+    private async cleanExpiredCache() {
         const now = Date.now();
         console.log("Verificando caches expirados:::::::::::::::::::::::::::::::::::::::::::::::::");
         
@@ -109,7 +113,7 @@ export class CacheService {
     }
 
 
-    async isDetectionClosed(detectionId){
+    private async isDetectionClosed(detectionId){
         try {
             const response = await firstValueFrom(
                 this.httpService.get(this.updaterApiUrl + `detections/isclosed/${detectionId}`)

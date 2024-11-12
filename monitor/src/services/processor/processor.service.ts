@@ -35,7 +35,8 @@ export class ProcessorService {
                 timestamp: timestamp,
                 categoryNumber: detectionClass.class
             }
-            if(!this.cacheService.isDetectionInCache(cameraName, detectionClass.class)){
+
+            if(!await this.cacheService.isDetectionInCache(cameraName, detectionClass.class)){
                 try {
                     console.log("vou enviar")
                     const response = await this.sendDetection(myDetection, detectionFrame);

@@ -62,7 +62,6 @@ export class ProcessorService {
               });
             
             form.append('detectionData', JSON.stringify(sendDetectionDto));
-
             const response = await firstValueFrom(
                 this.httpService.post(this.updaterApiUrl + "detections", form, // Dados do formulário
                     {
@@ -79,9 +78,13 @@ export class ProcessorService {
             }
             return response.data;
         } catch (error) {
-            console.log("ERROR: sendDetection")
-
-          throw new Error(error.response?.data || 'Error sending JSON data');
+                console.error("ERROR: sendDetection");
+                console.error("Status code:", error.response?.status);
+                console.error("Response data:", error.response?.data);
+                console.error("Headers:", error.response?.headers);
+                console.error("Message:", error.message);
+                console.error("Stack:", error.stack);
+                throw new Error(error.response?.data || 'Error sending JSON data');
         }
       }
 

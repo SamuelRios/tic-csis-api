@@ -3,7 +3,7 @@ import { MessageBody, SubscribeMessage, WebSocketGateway, WebSocketServer } from
 import { Server,Socket } from 'socket.io';
 import { DetectionsService } from '../../services/detections.service';
 
-@WebSocketGateway()
+@WebSocketGateway(3001, { transports: ['websocket'] })
 export class DetectionGateway {
 
   constructor(
@@ -20,6 +20,7 @@ export class DetectionGateway {
   }
 
   private async handleConnection(client: any) {
+    console.log("handle, conectado")
     const activeDetections = await this.detectionService.getAllActiveDetections(); // Chama o método do serviço
     client.emit("activeDetections", activeDetections); // Envia as detecções ativas para o cliente
   }

@@ -12,6 +12,7 @@ import { DetectionChangesEntity } from './detections/entities/detectionChangesHi
 import { DetectionNoteEntity } from './detections/entities/detectionNote.entity';
 import { RoleEntity } from './users/entities/role.entity';
 import { UsersModule } from './users/users.module';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -44,6 +45,7 @@ import { UsersModule } from './users/users.module';
       }),
     }),
     UsersModule,
+    AuthModule,
   ],
   controllers: [],
   providers: [],

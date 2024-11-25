@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { UserEntity } from '../entities/user.entity';
@@ -15,13 +15,13 @@ export class UserService {
 
   // Create a new user
   async create(createUserDto: CreateUserDto): Promise<UserEntity> {
-    // const role = await this.roleRepository.findOne({
-    //   where: { id: createUserDto.roleId },
-    // });
-    
-    // if (!role) {
-    //   throw new NotFoundException(`Role with ID ${createUserDto.roleId} not found`);
-    // }
+    const existingUser = await this.userRepository.findOne({
+      where: { email: createUserDto.email },
+    });
+  
+    if (existingUser) {
+      throw new ConflictException(`Email ${createUserDto.email} is already in use`);
+    }
 
     const now = new Date();
 

@@ -53,7 +53,7 @@ def main(directory: str, model_path: Optional[str] = None, model_path2: Optional
     i = 0
     for filename in os.listdir(directory):
         i += 1
-        camera_name = filename.split('f')[0]
+        camera_name = filename.split('f')[0].split(".")[0]
         # camera_name = "camera1"
         file_path = os.path.join(directory, filename)
         screenshot = cv.imread(file_path)

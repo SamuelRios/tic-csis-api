@@ -76,7 +76,7 @@ export class DetectionsController {
     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
     const ext = extname(detection.cameraName);
     const filename = `${uniqueSuffix}${ext}`;
-    const imagePath = path.join("C:/xampp/htdocs/dashboardcsis/imagens/frames", filename);
+    const imagePath = path.join("C:/xampp/htdocs/dashboardcsis/imagens/frames", filename +  ".png");
     const framePath = "imagens/frames/" + filename;
     if(!frame){
       console.log("não há imagens")

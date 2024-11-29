@@ -35,7 +35,7 @@ import numpy as np
 
 import time
 
-def main(directory: str, model_path: Optional[str] = None, model_path2: Optional[str] = None, model_path3: Optional[str] = None, model_path4: Optional[str] = None, image_folder: str = "detections") -> None:
+def main(directory: str, fire_model_path: Optional[str] = None, arma_model_path: Optional[str] = None, alag_model_path: Optional[str] = None, picha_model_path: Optional[str] = None, image_folder: str = "detections") -> None:
     get_websocket_connection('http://localhost:3000');
     
     start_time = time.time();
@@ -45,10 +45,10 @@ def main(directory: str, model_path: Optional[str] = None, model_path2: Optional
         return
 
     # Carrega os modelos
-    model = YOLO(model_path)
-    model2 = YOLO(model_path2)
-    model3 = YOLO(model_path3)
-    model4 = YOLO(model_path4)
+    fire_model = YOLO(fire_model_path)
+    arma_model = YOLO(arma_model_path)
+    alag_model = YOLO(alag_model_path)
+    picha_model = YOLO(picha_model_path)
 
     i = 0
     for filename in os.listdir(directory):
@@ -62,8 +62,8 @@ def main(directory: str, model_path: Optional[str] = None, model_path2: Optional
         date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
         # Processa com o modelo 1
-        results = model(screenshot)
-        results2 = model2(screenshot)
+        results = fire_model(screenshot)
+        results2 = arma_model(screenshot)
 
         if len(results[0].boxes) > 0:
             annotated_framemod1 = results[0].plot()
@@ -74,8 +74,8 @@ def main(directory: str, model_path: Optional[str] = None, model_path2: Optional
             send_detection(results, date, camera_name, annotated_framemod2)
            
         if i % 600 == 0:
-            results3 = model3(screenshot)
-            results4 = model4(screenshot)
+            results3 = alag_model(screenshot)
+            results4 = picha_model(screenshot)
             if len(results3[0].boxes) > 0:
                 annotated_framemod3 = results3[0].plot()
                 send_detection(results, date, camera_name, annotated_framemod3)
@@ -144,9 +144,9 @@ def disconnect():
 
 if __name__ == "__main__":
     main(
-        directory="C:\\Users\\mucar\\OneDrive\\Área de Trabalho\\detections\\",
-        model_path="C:\\Users\\mucar\\OneDrive\\Área de Trabalho\\public-safety.pt",
-        model_path2="C:\\Users\\mucar\\OneDrive\\Área de Trabalho\\public-safety.pt",
-        model_path3="C:\\Users\\mucar\\OneDrive\\Área de Trabalho\\public-safety.pt",
-        model_path4="C:\\Users\\mucar\\OneDrive\\Área de Trabalho\\public-safety.pt"
+        directory="./frames",
+        fire_model_path="./fogo.pt",
+        arma_model_path="./arma.pt",
+        alag_model_path="./alag.pt",
+        picha_model_path="./picha.pt"
     )

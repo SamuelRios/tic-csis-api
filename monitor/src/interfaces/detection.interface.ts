@@ -1,5 +1,5 @@
 interface Detection {
-    categoryNumber: number;
+    category: string;
     timestamp: string;
     cameraName: string;
 }

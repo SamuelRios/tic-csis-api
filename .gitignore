@@ -6,6 +6,10 @@
 /updater/node_modules
 /updater/build
 
+/model/models/*
+/model/frames/*
+/model/env/*
+
 # Logs
 logs
 *.log

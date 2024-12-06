@@ -2,7 +2,6 @@ import { HttpService } from '@nestjs/axios';
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { firstValueFrom } from 'rxjs';
-import { CategoryEnum } from 'src/enum/category.enum';
 
 @Injectable()
 export class CacheService {
@@ -11,6 +10,18 @@ export class CacheService {
     private cacheTTL = 60000; // Tempo de vida do cache em milissegundos
     private checkIntervalTime = 30000; // Intervalo de verificação do cache
     private detectionsCache: Record<string, Record<number, { detectionId: number, lastCheckedClosedDetection: number, lastCheckedDebounce: number }>> = {};
+
+    private debounceTTL = {
+        "spray": 300000,
+        "graffiti": 300000,
+        "gun": 300000,
+        "fire": 300000,
+        "smoke": 300000,
+        "knife": 300000,
+        "puddle": 300000,
+        "mud": 300000,
+        "person": 300000,
+    };
 
     constructor(
         private readonly config: ConfigService,
@@ -40,26 +51,26 @@ export class CacheService {
     }
 
     // Verifica se uma detecção já está no cache
-    public async isDetectionInCache(cameraName: string, categoryNumber: number): Promise<boolean> {
+    public async isDetectionInCache(cameraName: string, category: string): Promise<boolean> {
         console.log("Verificando se está no cache");
         const cameraCache = this.detectionsCache[cameraName];
         const now = Date.now();
 
         if (cameraCache) {
-            const detectionCache = cameraCache[categoryNumber];
+            const detectionCache = cameraCache[category];
     
             if (detectionCache) {
                 // Verifica se a detecção é válida com base no TTL e debounce
 
-                if(now - detectionCache.lastCheckedDebounce > CategoryEnum.getDebounceTTL(categoryNumber)) {
-                    this.deleteDetectionCache(cameraName, categoryNumber);
+                if(now - detectionCache.lastCheckedDebounce > this.debounceTTL[category]) {
+                    this.deleteDetectionCache(cameraName, category);
                     return false;
                 } // Atualiza o tempo de verificação
                 else detectionCache.lastCheckedDebounce = now;
 
                 if (now - detectionCache.lastCheckedClosedDetection > this.cacheTTL){
                     if(await this.isDetectionClosed(detectionCache.detectionId)){
-                        this.deleteDetectionCache(cameraName, categoryNumber)
+                        this.deleteDetectionCache(cameraName, category)
                         return false;
                     }
                     else detectionCache.lastCheckedClosedDetection = now;
@@ -70,11 +81,11 @@ export class CacheService {
     }
 
     // Limpa o cache para uma categoria específica de uma câmera
-    public deleteDetectionCache(cameraName: string, categoryNumber: number) {
+    public deleteDetectionCache(cameraName: string, category: string) {
         console.log("Limpando detecção do cache");
         const cameraCache = this.detectionsCache[cameraName];
         if (cameraCache) {
-            delete cameraCache[categoryNumber];
+            delete cameraCache[category];
 
             // Remove a câmera se não houver mais categorias
             if (Object.keys(cameraCache).length === 0) {
@@ -91,17 +102,16 @@ export class CacheService {
         for (const cameraName in this.detectionsCache) {
             const cameraCache = this.detectionsCache[cameraName];
 
-            for (const categoryNumberStr in cameraCache) {
-                const categoryNumber = Number(categoryNumberStr);
-                const detectionCache = cameraCache[categoryNumber];
+            for (const category in cameraCache) {
+                const detectionCache = cameraCache[category];
 
                 // Verifica se a detecção está expirada com base no TTL ou debounce
                 if ((now - detectionCache.lastCheckedClosedDetection > this.cacheTTL)){
-                    if(await this.isDetectionClosed(detectionCache.detectionId)) this.deleteDetectionCache(cameraName, categoryNumber)
+                    if(await this.isDetectionClosed(detectionCache.detectionId)) this.deleteDetectionCache(cameraName, category)
                     else detectionCache.lastCheckedClosedDetection = now;
                 }
-                if (now - detectionCache.lastCheckedDebounce > CategoryEnum.getDebounceTTL(categoryNumber)) {
-                    this.deleteDetectionCache(cameraName, categoryNumber);
+                if (now - detectionCache.lastCheckedDebounce > this.debounceTTL[category]) {
+                    this.deleteDetectionCache(cameraName, category);
                 }
             }
 

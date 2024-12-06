@@ -5,7 +5,6 @@ import * as FormData from 'form-data';
 import * as fs from 'fs';
 import { CacheService } from '../cache/cache.service';
 import { SendDetectionDto } from 'src/dto/send-detection.dto';
-import { CategoryEnum } from 'src/enum/category.enum';
 import { ConfigService } from '@nestjs/config';
 // import * as path from 'path';
 
@@ -33,7 +32,7 @@ export class ProcessorService {
             let myDetection = {
                 cameraName: cameraName,
                 timestamp: timestamp,
-                categoryNumber: detectionClass.class
+                category: detectionClass.class
             }
 
             if(!await this.cacheService.isDetectionInCache(cameraName, detectionClass.class)){
@@ -52,7 +51,7 @@ export class ProcessorService {
         try {
             const sendDetectionDto: SendDetectionDto = {
                 cameraName: detection.cameraName,
-                category: CategoryEnum.getCategoryName(detection.categoryNumber),
+                category: detection.category,
                 timestamp: detection.timestamp
             }
             const form = new FormData();
@@ -98,7 +97,7 @@ export class ProcessorService {
             let myDetection = {
                 cameraName: cameraName,
                 timestamp: timestamp,
-                categoryNumber: detectionClass.class
+                category: detectionClass.class
             }
             if(!this.cacheService.isDetectionInCache(cameraName, detectionClass.class)){
                 try {
@@ -115,11 +114,11 @@ export class ProcessorService {
     async sendDetectionSavedImg(detection: Detection){
         try {
             const formData = new FormData();
-            const categoryName = CategoryEnum.getCategoryName(detection.categoryNumber);
+            const categoryName = detection.category
 
             const sendDetectionDto: SendDetectionDto = {
                 cameraName: detection.cameraName,
-                category: CategoryEnum.getCategoryName(detection.categoryNumber),
+                category: detection.category,
                 timestamp: detection.timestamp
             }
             formData.append('detectionData', JSON.stringify(sendDetectionDto));

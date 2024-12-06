@@ -35,64 +35,77 @@ import numpy as np
 
 import time
 
-def main(directory: str, fire_model_path: Optional[str] = None, arma_model_path: Optional[str] = None, alag_model_path: Optional[str] = None, picha_model_path: Optional[str] = None, image_folder: str = "detections") -> None:
+frames_path      =   "./frames"
+fire_model_path  =  "./models/fogo.pt"
+arma_model_path  =  "./models/arma.pt"
+alag_model_path  =  "./models/alag.pt"
+picha_model_path = "./models/picha.pt"
+
+def main() -> None:
     get_websocket_connection('http://localhost:3000');
-    
     start_time = time.time();
 
-    if not os.path.exists(directory):
-        print(f"O diretório '{directory}' não existe.")
+    if not os.path.exists(frames_path):
+        print(f"O diretório '{frames_path}' não existe.")
         return
 
     # Carrega os modelos
-    fire_model = YOLO(fire_model_path)
-    arma_model = YOLO(arma_model_path)
-    alag_model = YOLO(alag_model_path)
-    picha_model = YOLO(picha_model_path)
+    fire_model, arma_model, alag_model, picha_model = getModels()
 
     i = 0
-    for filename in os.listdir(directory):
+    for filename in os.listdir(frames_path):
         i += 1
         camera_name = filename.split('f')[0].split(".")[0]
         # camera_name = "camera1"
-        file_path = os.path.join(directory, filename)
+        file_path = os.path.join(frames_path, filename)
         screenshot = cv.imread(file_path)
 
         # Captura o timestamp atual
         date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
         # Processa com o modelo 1
-        results = fire_model(screenshot)
-        results2 = arma_model(screenshot)
-
-        if len(results[0].boxes) > 0:
-            annotated_framemod1 = results[0].plot()
-            send_detection(results, date, camera_name, annotated_framemod1)
+        results_fire_model = fire_model(screenshot)
+        results_arma_moedel = arma_model(screenshot)
+        # dir(results_arma_moedel)
+        # return False
+        if len(results_fire_model[0].boxes) > 0:
+            annotated_framemod1 = results_fire_model[0].plot()
+        
+            send_detection(results_fire_model, fire_model.names, date, camera_name, annotated_framemod1)
            
-        if len(results2[0].boxes) > 0:
-            annotated_framemod2 = results2[0].plot()
-            send_detection(results, date, camera_name, annotated_framemod2)
+        if len(results_arma_moedel[0].boxes) > 0:
+            annotated_framemod2 = results_arma_moedel[0].plot()
+            send_detection(results_fire_model, fire_model.names, date, camera_name, annotated_framemod2)
            
         if i % 600 == 0:
-            results3 = alag_model(screenshot)
-            results4 = picha_model(screenshot)
-            if len(results3[0].boxes) > 0:
-                annotated_framemod3 = results3[0].plot()
-                send_detection(results, date, camera_name, annotated_framemod3)
+            results_alag_model = alag_model(screenshot)
+            results_picha_model = picha_model(screenshot)
+            if len(results_alag_model[0].boxes) > 0:
+                annotated_framemod3 = results_alag_model[0].plot()
+                send_detection(results_alag_model, alag_model.names, date, camera_name, annotated_framemod3)
 
-            if len(results4[0].boxes) > 0:
-                annotated_framemod4 = results4[0].plot()
-                send_detection(results, date, camera_name, annotated_framemod4)
+            if len(results_picha_model[0].boxes) > 0:
+                annotated_framemod4 = results_picha_model[0].plot()
+                send_detection(results_picha_model, picha_model.names, date, camera_name, annotated_framemod4)
     
         os.remove(file_path)
     end_time = time.time() 
     execution_time = end_time - start_time 
     print(f"Tempo de execução: {execution_time} segundos")
     disconnect_websocket()
+    
+def getModels():
+        return (
+            YOLO(fire_model_path),
+            YOLO(arma_model_path),
+            YOLO(alag_model_path),
+            YOLO(picha_model_path)
+        )
 
-def send_detection(results, date: str, camera_name: str, frame_array: np.ndarray ):
+def send_detection(results, classeNames, date: str, camera_name: str, frame_array: np.ndarray ):
     frame_bytes = get_frame_bytes(frame_array)
-    detection_data = get_detection_data(results, date, camera_name)
+    detection_data = get_detection_data(results, classeNames, date, camera_name)
+    print(detection_data)
     sio.emit('new_detection', {'detectionData': detection_data, 'frame': frame_bytes})
 
 def get_frame_bytes(frame_array):
@@ -102,12 +115,16 @@ def get_frame_bytes(frame_array):
         return frame_bytes
     return
 
-def get_detection_data(results, date: str, camera_name: str) -> dict: 
+def get_detection_data(results, classeNames, date: str, camera_name: str) -> dict: 
     detections = []
+    print(classeNames)
+    
     for result in results:
         for box in result.boxes:
+            print(box.cls.item())
+            print("alouewwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww")
             detections.append({
-                "class": int(box.cls),  # Classe detectada
+                "class": classeNames[box.cls.item()],  # Classe detectada
             })
     data = {
         "timestamp": date,
@@ -125,8 +142,7 @@ def get_websocket_connection(url):
             break  # Sai do loop se a conexão for bem-sucedida
         except Exception:
             print('Erro ao conectar ao servidor Socket.IO. Tentando novamente...')
-            
-            
+                    
 def disconnect_websocket():  
     sio.disconnect()
     
@@ -143,10 +159,4 @@ def disconnect():
     
 
 if __name__ == "__main__":
-    main(
-        directory="./frames",
-        fire_model_path="./fogo.pt",
-        arma_model_path="./arma.pt",
-        alag_model_path="./alag.pt",
-        picha_model_path="./picha.pt"
-    )
+    main()
